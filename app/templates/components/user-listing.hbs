@@ -1,0 +1,18 @@
+{{log 'usercda' user}}
+<article class="listing">
+  <img src="{{user.image}}" alt="">
+  <h3>{{user.name}}</h3>
+  <div class="detail">
+    <span>Age:</span> {{user.age}}
+  </div>
+  <div class="detail">
+    <span>status:</span> {{user.status}}
+  </div>
+  <div class="detail">
+    <span>Location:</span> {{user.city}}
+  </div>
+  <div class="detail">
+    <span>Email:</span> {{user.email}}
+  </div>
+</article>
+{{yield}}
