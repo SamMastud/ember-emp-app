@@ -1,11 +1,41 @@
 <div class="jumbo">
-  <div class="right tomster"></div>
-  <h2>Welcome!</h2>
+  {{!-- <div class="right niyuj-logo"></div> --}}
+  <button class="right button" {{action "toggleModal" this}}>Add User</button>
+  <h3>Welcome!</h3>
   <p>We hope you find exactly what you're looking for in a place to stay.</p>
-  {{#link-to 'about' class="button"}}
-    About Us
-  {{/link-to}}
+  
 </div>
-{{#each model.content as |item|}} {{log 'saa' item.firstObject}}
-  {{user-listing user=item._data}}
-{{/each}}
+<div class="employee-layout">
+  {{#each model.content as |item|}}
+    {{user-listing user=item._data}}
+  {{/each}}
+</div>
+
+{{#if isShowingModal}}
+  {{#modal-dialog onClose=(action (mut isShowingModal) false)
+    targetAttachment="center"
+    translucentOverlay=true 
+  }}
+          <div class="listing">
+              <h3>Create new profile</h3>
+              <div class="detail">
+                  <span>Name:</span> {{employee.name}}
+              </div>
+              <div class="detail">
+                  <span>Age:</span> {{employee.age}}
+              </div>
+              <div class="detail">
+                  <span>status:</span> {{employee.status}}
+              </div>
+              <div class="detail">
+                  <span>Location:</span> {{employee.city}}
+              </div>
+              <div class="detail">
+                  <span>Email:</span> {{employee.email}}
+              </div>
+              <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
+              {{!-- <button class="button" onclick={{action "saveUser" employee}}>Save</button> --}}
+          </div>   
+             
+  {{/modal-dialog}}
+{{/if}}

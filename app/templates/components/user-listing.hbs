@@ -1,7 +1,6 @@
-{{log 'usercda' user}}
 <article class="listing">
-  <img src="{{user.image}}" alt="">
-  <h3>{{user.name}}</h3>
+    <img src="{{user.image}}" alt="">    
+  <h4>{{user.name}}</h4>
   <div class="detail">
     <span>Age:</span> {{user.age}}
   </div>
@@ -14,5 +13,53 @@
   <div class="detail">
     <span>Email:</span> {{user.email}}
   </div>
+  <div class="detail">
+    <button class="button details-position" {{action "toggleModal"}}>See Details</button>
+  </div>
 </article>
+
+
+{{#if isShowingModal}}
+  {{#modal-dialog onClose="toggleModal"
+    targetAttachment="center"
+    translucentOverlay=true}}
+    <div class="listing">
+        <h3>Profile</h3>
+        <div class="detail">
+            <span>Name:</span> {{user.name}}
+        </div>
+        <div class="detail">
+            <span>Age:</span> {{user.age}}
+        </div>
+        <div class="detail">
+            <span>status:</span> {{user.status}}
+        </div>
+        <div class="detail">
+            <span>Location:</span> {{user.city}}
+        </div>
+        <div class="detail">
+            <span>Email:</span> {{user.email}}
+        </div>
+    </div>
+{{#each user.address as |address|}}
+   <div class="listing">
+       <h3>{{address.type}}</h3>
+         <div class="detail">
+            <span>Street:</span> {{address.street}}
+        </div>
+        <div class="detail">
+            <span>Zip Code:</span> {{address.pin-code}}
+        </div>
+        <div class="detail">
+            <span>City:</span> {{address.city}}
+        </div>
+        <div class="detail">
+            <span>Country:</span> {{address.country}}
+        </div>
+    </div>
+{{/each}}
+    
+  {{/modal-dialog}}
+{{/if}}
+
 {{yield}}

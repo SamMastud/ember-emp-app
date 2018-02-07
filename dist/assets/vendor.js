@@ -64914,6 +64914,70 @@ createDeprecatedModule('resolver');
   var versionRegExp = exports.versionRegExp = /\d[.]\d[.]\d/;
   var shaRegExp = exports.shaRegExp = /[a-z\d]{8}/;
 });
+;define('ember-ignore-children-helper/helpers/ignore-children', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ignoreChildren = ignoreChildren;
+
+  var _slicedToArray = function () {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+
+      try {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+
+          if (i && _arr.length === i) break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"]) _i["return"]();
+        } finally {
+          if (_d) throw _e;
+        }
+      }
+
+      return _arr;
+    }
+
+    return function (arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+
+  function ignoreChildren(_ref) {
+    var _ref2 = _slicedToArray(_ref, 1),
+        nextHandler = _ref2[0];
+
+    return function () {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      var event = args[args.length - 1];
+      if (event && event.target === event.currentTarget) {
+        nextHandler.apply(this, args);
+      }
+    };
+  }
+
+  exports.default = Ember.Helper.helper(ignoreChildren);
+});
 ;define('ember-inflector/index', ['exports', 'ember-inflector/lib/system', 'ember-inflector/lib/ext/string'], function (exports, _system) {
   'use strict';
 
@@ -65478,6 +65542,768 @@ createDeprecatedModule('resolver');
       app.instanceInitializer(resolveInitializer(moduleNames[i]));
     }
   }
+});
+;define('ember-modal-dialog/components/basic-dialog', ['exports', 'ember-modal-dialog/templates/components/basic-dialog'], function (exports, _basicDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Component.extend({
+    tagName: '',
+    layout: _basicDialog.default,
+
+    containerClassNames: null,
+    overlayClassNames: null,
+    wrapperClassNames: null,
+
+    modalService: Ember.inject.service('modal-dialog'),
+    destinationElementId: Ember.computed.oneWay('modalService.destinationElementId'),
+
+    variantWrapperClass: 'emd-static',
+    containerClassNamesString: Ember.computed('containerClassNames.[]', 'targetAttachmentClass', 'attachmentClass', 'containerClass', function () {
+      return [this.get('containerClassNames').join(' '), this.get('targetAttachmentClass'), this.get('attachmentClass'), this.get('containerClass')].filter(function (className) {
+        return !Ember.isEmpty(className);
+      }).join(' ');
+    }),
+    overlayClassNamesString: Ember.computed('overlayClassNames.[]', 'overlayClass', 'translucentOverlay', function () {
+      return [this.get('overlayClassNames').join(' '), this.get('translucentOverlay') ? 'translucent' : null, this.get('overlayClass')].filter(function (className) {
+        return !Ember.isEmpty(className);
+      }).join(' ');
+    }),
+    wrapperClassNamesString: Ember.computed('wrapperClassNames.[]', 'targetAttachmentClass', 'variantWrapperClass', 'wrapperClass', function () {
+      return [this.get('wrapperClassNames').join(' '), this.get('targetAttachmentClass').replace('emd-', 'emd-wrapper-'), this.get('variantWrapperClass'), this.get('wrapperClass')].filter(function (className) {
+        return !Ember.isEmpty(className);
+      }).join(' ');
+    }),
+
+    concatenatedProperties: ['containerClassNames', 'overlayClassNames', 'wrapperClassNames'],
+
+    translucentOverlay: false,
+    clickOutsideToClose: false,
+    hasOverlay: true,
+    isCentered: true,
+    overlayPosition: null,
+    isOverlaySibling: Ember.computed('overlayPosition', function () {
+      return this.get('overlayPosition') === 'sibling';
+    }),
+
+    isIOS: Ember.computed(function () {
+      return (/iPad|iPhone|iPod/.test(navigator.userAgent)
+      );
+    }),
+
+    makeOverlayClickableOnIOS: Ember.on('didInsertElement', function () {
+      if (this.get('isIOS')) {
+        Ember.$('div[data-ember-modal-dialog-overlay]').css('cursor', 'pointer');
+      }
+    }),
+
+    didInsertElement: function didInsertElement() {
+      var _this = this;
+
+      if (!this.get('clickOutsideToClose')) {
+        return;
+      }
+
+      var handleClick = function handleClick(event) {
+        var $eventTarget = Ember.$(event.target);
+
+        // if the click has already resulted in the target
+        // being removed or hidden, do nothing
+        if (!$eventTarget.is(':visible')) {
+          return;
+        }
+
+        // if the click is within the dialog, do nothing
+        if ($eventTarget.closest('.ember-modal-dialog').length) {
+          return;
+        }
+
+        _this.sendAction('onClose');
+      };
+      var registerClick = function registerClick() {
+        return Ember.$(window.document).on('click.ember-modal-dialog-' + Ember.guidFor(_this), handleClick);
+      };
+
+      // setTimeout needed or else the click handler will catch the click that spawned this modal dialog
+      setTimeout(registerClick);
+
+      if (this.get('isIOS')) {
+        var registerTouch = function registerTouch() {
+          return Ember.$(window.document).on('touchend.ember-modal-dialog-' + Ember.guidFor(_this), handleClick);
+        };
+        setTimeout(registerTouch);
+      }
+      this._super.apply(this, arguments);
+    },
+    willDestroyElement: function willDestroyElement() {
+      Ember.$(window.document).off('click.ember-modal-dialog-' + Ember.guidFor(this));
+      if (this.get('isIOS')) {
+        Ember.$(window.document).off('touchend.ember-modal-dialog-' + Ember.guidFor(this));
+      }
+      this._super.apply(this, arguments);
+    }
+  });
+});
+;define('ember-modal-dialog/components/deprecated-tether-dialog', ['exports', 'ember-modal-dialog/components/basic-dialog', 'ember-modal-dialog/templates/components/deprecated-tether-dialog'], function (exports, _basicDialog, _deprecatedTetherDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _basicDialog.default.extend({
+    layout: _deprecatedTetherDialog.default,
+    init: function init() {
+      this._super.apply(this, arguments);
+      Ember.deprecate('Direct usage of `tether-dialog` is deprecated in favor of opting into tethering behavior by passing a `tetherTarget` to `modal-dialog`. Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.tether-dialog', until: '3.0.0' });
+    },
+
+    modalService: Ember.inject.service('modal-dialog'),
+    destinationElementId: Ember.computed.oneWay('modalService.destinationElementId'),
+
+    // onClose - set this from templates
+    close: Ember.computed('onClose', {
+      get: function get() {
+        return this.get('onClose');
+      },
+      set: function set(key, value) {
+        Ember.deprecate('Specifying the `close` action for a modal-dialog/tether-dialog is deprecated in favor of `onClose`. Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.close-action', until: '3.0.0' });
+        this.set('onClose', value);
+      }
+    }),
+
+    // containerClass - set this from templates
+    "container-class": Ember.computed('containerClass', {
+      get: function get() {
+        return this.get('containerClass');
+      },
+      set: function set(key, value) {
+        Ember.deprecate('Passing `container-class` (kebab-case) is deprecated in favor of `containerClass` (camelCase). Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.kebab-props', until: '3.0.0' });
+        this.set('containerClass', value);
+      }
+    }),
+    containerClassNames: ['ember-modal-dialog'], // set this in a subclass definition
+    containerClassNamesString: Ember.computed('containerClassNames.[]', 'targetAttachmentClass', 'attachmentClass', 'containerClass', 'renderInPlace', function () {
+      return [this.get('containerClassNames').join(' '), this.get('targetAttachmentClass'), this.get('attachmentClass'), this.get('containerClass'), this.get('renderInPlace') ? 'ember-modal-dialog-in-place emd-in-place' : null].filter(function (className) {
+        return !Ember.isEmpty(className);
+      }).join(' ');
+    }),
+
+    // overlayClass - set this from templates
+    "overlay-class": Ember.computed('overlayClass', {
+      get: function get() {
+        return this.get('overlayClass');
+      },
+      set: function set(key, value) {
+        Ember.deprecate('Passing `overlay-class` (kebab-case) is deprecated in favor of `overlayClass` (camelCase). Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.kebab-props', until: '3.0.0' });
+        this.set('overlayClass', value);
+      }
+    }),
+    overlayClassNames: ['ember-modal-overlay'], // set this in a subclass definition
+
+    // wrapperClass - set this from templates
+    "wrapper-class": Ember.computed('wrapperClass', {
+      get: function get() {
+        return this.get('wrapperClass');
+      },
+      set: function set(key, value) {
+        Ember.deprecate('Passing `wrapper-class` (kebab-case) is deprecated in favor of `wrapperClass` (camelCase). Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.kebab-props', until: '3.0.0' });
+        this.set('wrapperClass', value);
+      }
+    }),
+    wrapperClassNames: ['ember-modal-wrapper'], // set this in a subclass definition
+
+    concatenatedProperties: ['containerClassNames', 'overlayClassNames', 'wrapperClassNames'],
+
+    targetAttachmentClass: Ember.computed('targetAttachment', function () {
+      var targetAttachment = this.get('targetAttachment') || '';
+      return 'ember-modal-dialog-target-attachment-' + Ember.String.dasherize(targetAttachment);
+    }),
+
+    targetAttachment: 'middle center',
+    attachment: 'middle center',
+    hasOverlay: true,
+    target: 'viewport', // element, css selector, view instance, 'viewport', or 'scroll-handle'
+
+    tetherClassPrefix: 'ember-tether',
+    // offset - passed in
+    // targetOffset - passed in
+    // targetModifier - passed in
+
+    isIOS: Ember.computed(function () {
+      return (/iPad|iPhone|iPod/.test(navigator.userAgent)
+      );
+    }),
+
+    makeOverlayClickableOnIOS: Ember.on('didInsertElement', function () {
+      if (this.get('isIOS') && this.get('hasOverlay')) {
+        Ember.$('div[data-emd-overlay]').css('cursor', 'pointer');
+      }
+    }),
+
+    actions: {
+      onClose: function onClose() {
+        this.sendAction('onClose');
+      },
+      onClickOverlay: function onClickOverlay(e) {
+        e.preventDefault();
+        if (this.get('onClickOverlay')) {
+          this.sendAction('onClickOverlay');
+        } else {
+          this.sendAction('onClose');
+        }
+      }
+    }
+
+  });
+});
+;define('ember-modal-dialog/components/in-place-dialog', ['exports', 'ember-modal-dialog/templates/components/in-place-dialog'], function (exports, _inPlaceDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  var computedJoin = function computedJoin(prop) {
+    return Ember.computed(prop, function () {
+      return this.get(prop).join(' ');
+    });
+  };
+
+  exports.default = Ember.Component.extend({
+    tagName: '',
+    layout: _inPlaceDialog.default,
+
+    containerClass: null, // passed in
+    containerClassNames: ['ember-modal-dialog', 'ember-modal-dialog-in-place', 'emd-in-place'], // set this in a subclass definition
+    containerClassNamesString: computedJoin('containerClassNames'),
+
+    concatenatedProperties: ['containerClassNames']
+  });
+});
+;define('ember-modal-dialog/components/liquid-dialog', ['exports', 'ember-modal-dialog/components/basic-dialog', 'ember-modal-dialog/templates/components/liquid-dialog'], function (exports, _basicDialog, _liquidDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _basicDialog.default.extend({
+    layout: _liquidDialog.default,
+    hasOverlay: true,
+    containerClassNames: ['liquid-dialog'],
+    variantWrapperClass: 'emd-animatable'
+  });
+});
+;define('ember-modal-dialog/components/liquid-tether-dialog', ['exports', 'ember-modal-dialog/components/basic-dialog', 'ember-modal-dialog/templates/components/liquid-tether-dialog'], function (exports, _basicDialog, _liquidTetherDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _basicDialog.default.extend({
+    layout: _liquidTetherDialog.default,
+
+    targetAttachmentClass: Ember.computed('targetAttachment', function () {
+      var targetAttachment = this.get('targetAttachment') || '';
+      return 'ember-modal-dialog-target-attachment-' + Ember.String.dasherize(targetAttachment);
+    }),
+
+    targetAttachment: null,
+    attachment: null,
+    didReceiveAttrs: function didReceiveAttrs() {
+      this._super.apply(this, arguments);
+      if (!this.get('attachment')) {
+        this.set('attachment', 'middle center');
+      }
+      if (!this.get('targetAttachment')) {
+        this.set('targetAttachment', 'middle center');
+      }
+    },
+
+    tetherClassPrefix: Ember.computed({
+      get: function get() {
+        return 'liquid-tether';
+      },
+      set: function set(key, val) {
+        if (val) {
+          return val;
+        }
+        return 'liquid-tether';
+      }
+    }),
+    hasOverlay: true,
+    tetherTarget: null // element, css selector, view instance, 'viewport', or 'scroll-handle'
+    // offset - passed in
+    // targetOffset - passed in
+    // targetModifier - passed in
+  });
+});
+;define('ember-modal-dialog/components/modal-dialog-overlay', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Component.extend({
+    init: function init() {
+      this._super.apply(this, arguments);
+      (true && !(false) && Ember.deprecate('The modal-dialog-overlay component is deprecated. Use a div with an onclick handler instead. Will be removed in 3.0.0', false, { id: 'ember-modal-dialog.modal-dialog-overlay', until: '3.0.0' }));
+    },
+
+    attributeBindings: ['data-ember-modal-dialog-overlay'],
+    'data-ember-modal-dialog-overlay': true,
+
+    // trigger only when clicking the overlay itself, not its children
+    click: function click(event) {
+      if (event.target === this.get('element')) {
+        this.sendAction();
+      }
+    }
+  });
+});
+;define('ember-modal-dialog/components/modal-dialog', ['exports', 'ember-modal-dialog/templates/components/modal-dialog'], function (exports, _modalDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  var VALID_OVERLAY_POSITIONS = ['parent', 'sibling'];
+
+  function deprecateImplicitAnimatableWithLiquidTetherPresent() {
+    (true && !(false) && Ember.deprecate('Rendering modal-dialog with a tetherTarget and liquid-tether installed, and NOT explicitly specifying `animatable` will change behavior in 3.0.0 to use liquid-tether. Pass `animatable=false` to maintain current behavior and remove this message.', false, { id: 'ember-modal-dialog.implicit-animatable', until: '3.0.0' }));
+  }
+
+  function deprecateImplicitAnimatableWithLiquidWormholePresent() {
+    (true && !(false) && Ember.deprecate('Rendering modal-dialog with liquid-wormhole installed, and NOT explicitly specifying `animatable` will change behavior in 3.0.0 to use liquid-wormhole. Pass `animatable=false` to maintain current behavior and remove this message.', false, { id: 'ember-modal-dialog.implicit-animatable', until: '3.0.0' }));
+  }
+
+  exports.default = Ember.Component.extend({
+    tagName: '',
+    layout: _modalDialog.default,
+    modalService: Ember.inject.service('modal-dialog'),
+    destinationElementId: Ember.computed.oneWay('modalService.destinationElementId'),
+    modalDialogComponentName: Ember.computed('renderInPlace', 'tetherTarget', 'animatable', 'hasLiquidWormhole', 'hasLiquidTether', function () {
+      var tetherTarget = this.get('tetherTarget');
+      var hasLiquidTether = this.get('hasLiquidTether');
+      var hasLiquidWormhole = this.get('hasLiquidWormhole');
+      var animatable = this.get('animatable');
+
+      if (this.get('renderInPlace')) {
+        return 'ember-modal-dialog/-in-place-dialog';
+      } else if (tetherTarget && hasLiquidTether && hasLiquidWormhole && Ember.isNone(animatable)) {
+        deprecateImplicitAnimatableWithLiquidTetherPresent();
+        this.ensureEmberTetherPresent();
+        return 'ember-modal-dialog/-tether-dialog';
+      } else if (tetherTarget && hasLiquidTether && hasLiquidWormhole && animatable === true) {
+        return 'ember-modal-dialog/-liquid-tether-dialog';
+      } else if (tetherTarget) {
+        this.ensureEmberTetherPresent();
+        return 'ember-modal-dialog/-tether-dialog';
+      } else if (hasLiquidWormhole && Ember.isNone(animatable)) {
+        deprecateImplicitAnimatableWithLiquidWormholePresent();
+        return 'ember-modal-dialog/-basic-dialog';
+      } else if (hasLiquidWormhole && animatable === true) {
+        return 'ember-modal-dialog/-liquid-dialog';
+      }
+      return 'ember-modal-dialog/-basic-dialog';
+    }),
+    animatable: null,
+    hasLiquidWormhole: Ember.computed.readOnly('modalService.hasLiquidWormhole'),
+    hasLiquidTether: Ember.computed.readOnly('modalService.hasLiquidTether'),
+
+    didReceiveAttrs: function didReceiveAttrs() {
+      this._super.apply(this, arguments);
+      if (true) {
+        this.validateProps();
+      }
+    },
+    validateProps: function validateProps() {
+      var overlayPosition = this.get('overlayPosition');
+      if (VALID_OVERLAY_POSITIONS.indexOf(overlayPosition) === -1) {
+        (true && Ember.warn('overlayPosition value \'' + overlayPosition + '\' is not valid (valid values [' + VALID_OVERLAY_POSITIONS.join(', ') + '])', false, { id: 'ember-modal-dialog.validate-overlay-position' }));
+      }
+    },
+
+    // onClose - set this from templates
+    close: Ember.computed('onClose', {
+      get: function get() {
+        return this.get('onClose');
+      },
+      set: function set(key, value) {
+        (true && !(false) && Ember.deprecate('Specifying the `close` action for a modal-dialog/tether-dialog is deprecated in favor of `onClose`. Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.close-action', until: '3.0.0' }));
+
+        this.set('onClose', value);
+      }
+    }),
+
+    // containerClass - set this from templates
+    "container-class": Ember.computed('containerClass', {
+      get: function get() {
+        return this.get('containerClass');
+      },
+      set: function set(key, value) {
+        (true && !(false) && Ember.deprecate('Passing `container-class` (kebab-case) is deprecated in favor of `containerClass` (camelCase). Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.kebab-props', until: '3.0.0' }));
+
+        this.set('containerClass', value);
+      }
+    }),
+    containerClassNames: ['ember-modal-dialog'], // set this in a subclass definition
+
+    // overlayClass - set this from templates
+    "overlay-class": Ember.computed('overlayClass', {
+      get: function get() {
+        return this.get('overlayClass');
+      },
+      set: function set(key, value) {
+        (true && !(false) && Ember.deprecate('Passing `overlay-class` (kebab-case) is deprecated in favor of `overlayClass` (camelCase). Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.kebab-props', until: '3.0.0' }));
+
+        this.set('overlayClass', value);
+      }
+    }),
+    overlayClassNames: ['ember-modal-overlay'], // set this in a subclass definition
+
+    // wrapperClass - set this from templates
+    "wrapper-class": Ember.computed('wrapperClass', {
+      get: function get() {
+        return this.get('wrapperClass');
+      },
+      set: function set(key, value) {
+        (true && !(false) && Ember.deprecate('Passing `wrapper-class` (kebab-case) is deprecated in favor of `wrapperClass` (camelCase). Will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.kebab-props', until: '3.0.0' }));
+
+        this.set('wrapperClass', value);
+      }
+    }),
+    wrapperClassNames: ['ember-modal-wrapper'], // set this in a subclass definition
+
+    concatenatedProperties: ['containerClassNames', 'overlayClassNames', 'wrapperClassNames'],
+
+    hasOverlay: true,
+    translucentOverlay: false,
+    overlayPosition: 'parent', // `parent` or `sibling`
+    clickOutsideToClose: false,
+    renderInPlace: false,
+    tetherTarget: null,
+    stack: Ember.computed.oneWay('elementId'), // pass a `stack` string to set a "stack" to be passed to liquid-wormhole / liquid-tether
+    value: 0, // pass a `value` to set a "value" to be passed to liquid-wormhole / liquid-tether
+    target: Ember.computed({
+      // element, css selector, or view instance
+      get: function get() {
+        return 'body';
+      },
+      set: function set(key, value) {
+        (true && !(false) && Ember.deprecate('Specifying a `target` on `modal-dialog` is deprecated in favor of padding `tetherTarget`, which will trigger ember-tether usage. Support for `target` will be removed in 3.0.0.', false, { id: 'ember-modal-dialog.modal-dialog-target', until: '3.0.0' }));
+
+        return value;
+      }
+    }),
+
+    targetAttachment: 'middle center',
+    tetherClassPrefix: null,
+    attachmentClass: Ember.computed('attachment', function () {
+      var attachment = this.get('attachment');
+      if (Ember.isEmpty(attachment)) {
+        return;
+      }
+      return attachment.split(' ').map(function (attachmentPart) {
+        return 'emd-attachment-' + Ember.String.dasherize(attachmentPart);
+      }).join(' ');
+    }),
+    targetAttachmentClass: Ember.computed('targetAttachment', function () {
+      var targetAttachment = this.get('targetAttachment') || '';
+      // Convert tether-styled values like 'middle right' to 'right'
+      targetAttachment = targetAttachment.split(' ').slice(-1)[0];
+      return 'ember-modal-dialog-target-attachment-' + Ember.String.dasherize(targetAttachment) + ' emd-target-attachment-' + Ember.String.dasherize(targetAttachment);
+    }),
+    ensureEmberTetherPresent: function ensureEmberTetherPresent() {
+      if (!this.get('modalService.hasEmberTether')) {
+        throw new Error('Please install ember-tether in order to pass a tetherTarget to modal-dialog');
+      }
+    },
+
+    actions: {
+      onClose: function onClose() {
+        this.sendAction('onClose');
+      },
+      onClickOverlay: function onClickOverlay(e) {
+        e.preventDefault();
+        if (this.get('onClickOverlay')) {
+          this.sendAction('onClickOverlay');
+        } else {
+          this.sendAction('onClose');
+        }
+      }
+    }
+  });
+});
+;define('ember-modal-dialog/components/positioned-container', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var SUPPORTED_TARGET_ATTACHMENTS = ['top', 'right', 'bottom', 'left', 'center', 'elementCenter', 'none'];
+
+  exports.default = Ember.Component.extend({
+
+    // target - element selector, element, or Ember View
+    // targetAttachment - top, right, bottom, left, center, or none
+    //   left, right, top, bottom (relative to target)
+    //   center (relative to container)
+    targetAttachment: 'center',
+
+    isPositioned: Ember.computed('targetAttachment', 'target', 'renderInPlace', function () {
+      if (this.get('renderInPlace')) {
+        return false;
+      }
+      var target = this.get('target');
+      var targetAttachment = this.get('targetAttachment');
+      if (target === 'body' && (targetAttachment === 'center' || targetAttachment === 'middle center')) {
+        return false;
+      }
+
+      if (target && targetAttachment) {
+        return true;
+      }
+
+      return false;
+    }),
+
+    didGetPositioned: Ember.observer('isPositioned', Ember.on('didInsertElement', function () {
+      if (this._state !== 'inDOM') {
+        return;
+      }
+
+      if (this.get('isPositioned')) {
+        this.updateTargetAttachment();
+      } else {
+        this.$().css('left', '').css('top', '');
+      }
+    })),
+
+    getWrappedTargetAttachmentElement: function getWrappedTargetAttachmentElement() {
+      var target = this.get('target');
+      if (!target) {
+        return null;
+      }
+
+      if (Ember.typeOf(target) === 'string') {
+        var targetSelector = target;
+        var wrappedElement = Ember.$(targetSelector).eq(0);
+        (true && !(wrappedElement) && Ember.assert('No element found for modal-dialog\'s target selector \'' + targetSelector + '\'.', wrappedElement));
+
+        return wrappedElement;
+      }
+
+      // passed an ember view or component
+      if (target.element) {
+        return Ember.$(target.element);
+      }
+
+      // passed an element directly
+      return Ember.$(target);
+    },
+    updateTargetAttachment: function updateTargetAttachment() {
+      var targetAttachment = this.get('targetAttachment');
+      // Convert tether-styled values like 'middle right' to 'right'
+      targetAttachment = targetAttachment.split(' ').slice(-1)[0];
+      (true && !(SUPPORTED_TARGET_ATTACHMENTS.indexOf(targetAttachment) > -1) && Ember.assert('Positioned container supports targetAttachments of ' + SUPPORTED_TARGET_ATTACHMENTS.join(', '), SUPPORTED_TARGET_ATTACHMENTS.indexOf(targetAttachment) > -1));
+
+      var targetAttachmentMethod = 'align' + Ember.String.capitalize(targetAttachment);
+      var targetAttachmentElement = this.getWrappedTargetAttachmentElement();
+
+      this[targetAttachmentMethod](targetAttachmentElement);
+    },
+    alignCenter: function alignCenter() {
+      var elementWidth = this.$().outerWidth();
+      var elementHeight = this.$().outerHeight();
+
+      this.$().css('left', '50%').css('top', '50%').css('margin-left', elementWidth * -0.5).css('margin-top', elementHeight * -0.5);
+    },
+    alignLeft: function alignLeft(targetAttachmentElement) {
+      (true && !(targetAttachmentElement.length > 0) && Ember.assert('Left targetAttachment requires a target', targetAttachmentElement.length > 0));
+
+
+      var elementWidth = this.$().outerWidth();
+      var originOffset = targetAttachmentElement.offset();
+      var originOffsetTop = originOffset.top - Ember.$(window).scrollTop();
+
+      this.$().css('left', originOffset.left - elementWidth).css('top', originOffsetTop);
+    },
+    alignRight: function alignRight(targetAttachmentElement) {
+      (true && !(targetAttachmentElement.length > 0) && Ember.assert('Right targetAttachment requires a target', targetAttachmentElement.length > 0));
+
+
+      var targetWidth = targetAttachmentElement.outerWidth();
+      var originOffset = targetAttachmentElement.offset();
+      var originOffsetTop = originOffset.top - Ember.$(window).scrollTop();
+
+      this.$().css('left', originOffset.left + targetWidth).css('top', originOffsetTop);
+    },
+    alignTop: function alignTop(targetAttachmentElement) {
+      (true && !(targetAttachmentElement.length > 0) && Ember.assert('Top targetAttachment requires a target', targetAttachmentElement.length > 0));
+
+
+      var elementWidth = this.$().outerWidth();
+      var elementHeight = this.$().outerHeight();
+      var originOffset = targetAttachmentElement.offset();
+      var originOffsetTop = originOffset.top - Ember.$(window).scrollTop();
+      var targetWidth = targetAttachmentElement.outerWidth();
+
+      this.$().css('left', originOffset.left + targetWidth / 2 - elementWidth / 2).css('top', originOffsetTop - elementHeight);
+    },
+    alignBottom: function alignBottom(targetAttachmentElement) {
+      (true && !(targetAttachmentElement.length > 0) && Ember.assert('Bottom targetAttachment requires a target', targetAttachmentElement.length > 0));
+
+
+      var elementWidth = this.$().outerWidth();
+      var originOffset = targetAttachmentElement.offset();
+      var originOffsetTop = originOffset.top - Ember.$(window).scrollTop();
+      var targetWidth = targetAttachmentElement.outerWidth();
+      var targetHeight = targetAttachmentElement.outerHeight();
+
+      this.$().css('left', originOffset.left + targetWidth / 2 - elementWidth / 2).css('top', originOffsetTop + targetHeight);
+    },
+    alignElementCenter: function alignElementCenter(targetAttachmentElement) {
+      (true && !(targetAttachmentElement.length > 0) && Ember.assert('ElementCenter targetAttachment requires a target', targetAttachmentElement.length > 0));
+
+
+      var elementWidth = this.$().outerWidth();
+      var originOffset = targetAttachmentElement.offset();
+      var originOffsetTop = originOffset.top - Ember.$(window).scrollTop();
+      var targetWidth = targetAttachmentElement.outerWidth();
+      var targetHeight = targetAttachmentElement.outerHeight();
+      var elementHeight = this.$().outerHeight();
+
+      this.$().css('left', originOffset.left + targetWidth / 2 - elementWidth / 2).css('top', originOffsetTop + targetHeight / 2 - elementHeight / 2);
+    },
+    alignNone: function alignNone() {}
+  });
+});
+;define('ember-modal-dialog/components/tether-dialog', ['exports', 'ember-modal-dialog/components/basic-dialog', 'ember-modal-dialog/templates/components/tether-dialog'], function (exports, _basicDialog, _tetherDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _basicDialog.default.extend({
+    layout: _tetherDialog.default,
+
+    targetAttachmentClass: Ember.computed('targetAttachment', function () {
+      var targetAttachment = this.get('targetAttachment') || '';
+      return 'ember-modal-dialog-target-attachment-' + Ember.String.dasherize(targetAttachment);
+    }),
+
+    targetAttachment: null,
+    attachment: null,
+    didReceiveAttrs: function didReceiveAttrs() {
+      this._super.apply(this, arguments);
+      if (!this.get('attachment')) {
+        this.set('attachment', 'middle center');
+      }
+      if (!this.get('targetAttachment')) {
+        this.set('targetAttachment', 'middle center');
+      }
+    },
+
+    tetherTarget: null, // element, css selector, view instance, 'viewport', or 'scroll-handle'
+    tetherClassPrefix: Ember.computed({
+      get: function get() {
+        return 'ember-tether';
+      },
+      set: function set(key, val) {
+        if (val) {
+          return val;
+        }
+        return 'ember-tether';
+      }
+    })
+    // offset - passed in
+    // targetOffset - passed in
+    // targetModifier - passed in
+  });
+});
+;define('ember-modal-dialog/initializers/add-modals-container', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  exports.default = function (App) {
+    var emberModalDialog = App.emberModalDialog || {};
+    var modalContainerElId = emberModalDialog.modalRootElementId || 'modal-overlays';
+
+    App.register('config:modals-container-id', modalContainerElId, { instantiate: false });
+
+    App.inject('service:modal-dialog', 'destinationElementId', 'config:modals-container-id');
+
+    appendContainerElement(App.rootElement, modalContainerElId);
+  };
+
+  /*globals document */
+  var hasDOM = typeof document !== 'undefined';
+
+  function appendContainerElement(rootElementId, id) {
+    if (!hasDOM) {
+      return;
+    }
+
+    if (document.getElementById(id)) {
+      return;
+    }
+
+    var rootEl = document.querySelector(rootElementId);
+    var modalContainerEl = document.createElement('div');
+    modalContainerEl.id = id;
+    rootEl.appendChild(modalContainerEl);
+  }
+});
+;define("ember-modal-dialog/templates/components/basic-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "ORzwv05V", "block": "{\"statements\":[[6,[\"ember-wormhole\"],null,[[\"to\"],[[28,[\"destinationElementId\"]]]],{\"statements\":[[6,[\"if\"],[[28,[\"isOverlaySibling\"]]],null,{\"statements\":[[0,\"    \"],[11,\"div\",[]],[16,\"class\",[34,[[26,[\"wrapperClassNamesString\"]],\" \",[26,[\"wrapperClass\"]]]]],[13],[0,\"\\n\"],[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[0,\"        \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[28,[\"onClickOverlay\"]]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null],[6,[\"ember-modal-dialog-positioned-container\"],null,[[\"class\",\"targetAttachment\",\"target\"],[[28,[\"containerClassNamesString\"]],[28,[\"targetAttachment\"]],[28,[\"legacyTarget\"]]]],{\"statements\":[[0,\"        \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null],[0,\"    \"],[14],[0,\"\\n\"]],\"locals\":[]},{\"statements\":[[0,\"    \"],[11,\"div\",[]],[16,\"class\",[34,[[26,[\"wrapperClassNamesString\"]],\" \",[26,[\"wrapperClass\"]]]]],[13],[0,\"\\n\"],[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[0,\"        \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[33,[\"ignore-children\"],[[28,[\"onClickOverlay\"]]],null]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[0,\"\\n\"],[6,[\"ember-modal-dialog-positioned-container\"],null,[[\"class\",\"targetAttachment\",\"target\"],[[28,[\"containerClassNamesString\"]],[28,[\"targetAttachment\"]],[28,[\"legacyTarget\"]]]],{\"statements\":[[0,\"            \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null],[0,\"        \"],[14],[0,\"\\n\"]],\"locals\":[]},{\"statements\":[[6,[\"ember-modal-dialog-positioned-container\"],null,[[\"class\",\"targetAttachment\",\"target\"],[[28,[\"containerClassNamesString\"]],[28,[\"targetAttachment\"]],[28,[\"legacyTarget\"]]]],{\"statements\":[[0,\"          \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]}],[0,\"    \"],[14],[0,\"\\n\"]],\"locals\":[]}]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/basic-dialog.hbs" } });
+});
+;define("ember-modal-dialog/templates/components/deprecated-tether-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "FPiiIY39", "block": "{\"statements\":[[6,[\"ember-wormhole\"],null,[[\"to\",\"renderInPlace\"],[[28,[\"destinationElementId\"]],[28,[\"renderInPlace\"]]]],{\"statements\":[[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[0,\"    \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[33,[\"action\"],[[28,[null]],\"onClickOverlay\"],null]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[6,[\"if\"],[[28,[\"renderInPlace\"]]],null,{\"statements\":[[6,[\"ember-modal-dialog-positioned-container\"],null,[[\"class\",\"targetAttachment\",\"target\",\"renderInPlace\"],[[28,[\"containerClassNamesString\"]],[28,[\"targetAttachment\"]],[28,[\"target\"]],[28,[\"renderInPlace\"]]]],{\"statements\":[[0,\"    \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},{\"statements\":[[6,[\"ember-tether\"],null,[[\"class\",\"target\",\"attachment\",\"targetAttachment\",\"targetModifier\",\"classPrefix\",\"offset\",\"targetOffset\",\"constraints\"],[[28,[\"containerClassNamesString\"]],[28,[\"target\"]],[28,[\"attachment\"]],[28,[\"targetAttachment\"]],[28,[\"targetModifier\"]],[28,[\"tetherClassPrefix\"]],[28,[\"offset\"]],[28,[\"targetOffset\"]],[28,[\"constraints\"]]]],{\"statements\":[[0,\"    \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]}]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/deprecated-tether-dialog.hbs" } });
+});
+;define("ember-modal-dialog/templates/components/in-place-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "W8tfB252", "block": "{\"statements\":[[11,\"div\",[]],[16,\"class\",[33,[\"concat\"],[[28,[\"containerClassNamesString\"]],\" \",[28,[\"attachmentClass\"]],\" \",[28,[\"containerClass\"]]],null],null],[13],[0,\"\\n  \"],[18,\"default\"],[0,\"\\n\"],[14],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/in-place-dialog.hbs" } });
+});
+;define("ember-modal-dialog/templates/components/liquid-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "FelUOKgZ", "block": "{\"statements\":[[6,[\"if\"],[[28,[\"isOverlaySibling\"]]],null,{\"statements\":[[6,[\"liquid-wormhole\"],null,[[\"stack\",\"value\",\"class\"],[[28,[\"stack\"]],[28,[\"value\"]],[33,[\"concat\"],[\"liquid-dialog-container \",[28,[\"wrapperClassNamesString\"]],\" \",[28,[\"wrapperClass\"]]],null]]],{\"statements\":[[0,\"    \"],[11,\"div\",[]],[16,\"class\",[34,[[26,[\"wrapperClassNamesString\"]],\" \",[26,[\"wrapperClass\"]]]]],[13],[0,\"\\n\"],[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[0,\"        \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[28,[\"onClickOverlay\"]]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"      \"],[11,\"div\",[]],[16,\"class\",[26,[\"containerClassNamesString\"]],null],[13],[0,\"\\n        \"],[18,\"default\"],[0,\"\\n      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},{\"statements\":[[6,[\"liquid-wormhole\"],null,[[\"stack\",\"value\",\"class\"],[[28,[\"stack\"]],[28,[\"value\"]],[33,[\"concat\"],[\"liquid-dialog-container \",[28,[\"wrapperClassNamesString\"]],\" \",[28,[\"wrapperClass\"]]],null]]],{\"statements\":[[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[0,\"      \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[33,[\"ignore-children\"],[[28,[\"onClickOverlay\"]]],null]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[0,\"\\n        \"],[11,\"div\",[]],[16,\"class\",[26,[\"containerClassNamesString\"]],null],[13],[0,\"\\n          \"],[18,\"default\"],[0,\"\\n        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n\"]],\"locals\":[]},{\"statements\":[[0,\"      \"],[11,\"div\",[]],[16,\"class\",[26,[\"containerClassNamesString\"]],null],[13],[0,\"\\n        \"],[18,\"default\"],[0,\"\\n      \"],[14],[0,\"\\n\"]],\"locals\":[]}]],\"locals\":[]},null]],\"locals\":[]}]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/liquid-dialog.hbs" } });
+});
+;define("ember-modal-dialog/templates/components/liquid-tether-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "XzWofP1S", "block": "{\"statements\":[[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[6,[\"liquid-wormhole\"],null,[[\"stack\",\"class\"],[\"modal-overlay\",\"liquid-dialog-container\"]],{\"statements\":[[0,\"    \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[28,[\"onClickOverlay\"]]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[6,[\"liquid-tether\"],null,[[\"class\",\"target\",\"attachment\",\"targetAttachment\",\"targetModifier\",\"classPrefix\",\"offset\",\"targetOffset\",\"constraints\",\"stack\",\"value\"],[[28,[\"containerClassNamesString\"]],[28,[\"tetherTarget\"]],[28,[\"attachment\"]],[28,[\"targetAttachment\"]],[28,[\"targetModifier\"]],[28,[\"tetherClassPrefix\"]],[28,[\"offset\"]],[28,[\"targetOffset\"]],[28,[\"constraints\"]],[28,[\"stack\"]],[28,[\"value\"]]]],{\"statements\":[[0,\"  \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/liquid-tether-dialog.hbs" } });
+});
+;define("ember-modal-dialog/templates/components/modal-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "r3hyIhDM", "block": "{\"statements\":[[6,[\"component\"],[[28,[\"modalDialogComponentName\"]]],[[\"wrapperClass\",\"wrapperClassNames\",\"overlayClass\",\"overlayClassNames\",\"containerClass\",\"containerClassNames\",\"hasOverlay\",\"translucentOverlay\",\"clickOutsideToClose\",\"destinationElementId\",\"overlayPosition\",\"tetherTarget\",\"legacyTarget\",\"attachment\",\"targetAttachment\",\"targetModifier\",\"targetOffset\",\"offset\",\"tetherClassPrefix\",\"constraints\",\"attachmentClass\",\"targetAttachmentClass\",\"stack\",\"value\",\"onClickOverlay\",\"onClose\"],[[28,[\"wrapperClass\"]],[28,[\"wrapperClassNames\"]],[28,[\"overlayClass\"]],[28,[\"overlayClassNames\"]],[28,[\"containerClass\"]],[28,[\"containerClassNames\"]],[28,[\"hasOverlay\"]],[28,[\"translucentOverlay\"]],[28,[\"clickOutsideToClose\"]],[28,[\"destinationElementId\"]],[28,[\"overlayPosition\"]],[28,[\"tetherTarget\"]],[28,[\"target\"]],[28,[\"attachment\"]],[28,[\"targetAttachment\"]],[28,[\"targetModifier\"]],[28,[\"targetOffset\"]],[28,[\"offset\"]],[28,[\"tetherClassPrefix\"]],[28,[\"constraints\"]],[28,[\"attachmentClass\"]],[28,[\"targetAttachmentClass\"]],[28,[\"stack\"]],[28,[\"value\"]],[33,[\"action\"],[[28,[null]],\"onClickOverlay\"],null],[33,[\"action\"],[[28,[null]],\"onClose\"],null]]],{\"statements\":[[0,\"  \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/modal-dialog.hbs" } });
+});
+;define("ember-modal-dialog/templates/components/tether-dialog", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "/GptWTmJ", "block": "{\"statements\":[[6,[\"if\"],[[28,[\"hasOverlay\"]]],null,{\"statements\":[[6,[\"ember-wormhole\"],null,[[\"to\"],[[28,[\"destinationElementId\"]]]],{\"statements\":[[0,\"    \"],[11,\"div\",[]],[16,\"class\",[26,[\"overlayClassNamesString\"]],null],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[28,[\"onClickOverlay\"]]],null],null],[15,\"tabindex\",\"-1\"],[15,\"data-emd-overlay\",\"\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[6,[\"ember-tether\"],null,[[\"class\",\"target\",\"attachment\",\"targetAttachment\",\"targetModifier\",\"classPrefix\",\"offset\",\"targetOffset\",\"constraints\"],[[28,[\"containerClassNamesString\"]],[28,[\"tetherTarget\"]],[28,[\"attachment\"]],[28,[\"targetAttachment\"]],[28,[\"targetModifier\"]],[28,[\"tetherClassPrefix\"]],[28,[\"offset\"]],[28,[\"targetOffset\"]],[28,[\"constraints\"]]]],{\"statements\":[[0,\"  \"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-modal-dialog/templates/components/tether-dialog.hbs" } });
 });
 ;/*
  * This is a stub file, it must be on disk b/c babel-plugin-debug-macros
@@ -66119,6 +66945,210 @@ define("ember-resolver/features", [], function () {
 
   exports.__esModule = true;
   exports.default = Ember.HTMLBars.template({ "id": "t1+kJFex", "block": "{\"statements\":[[11,\"div\",[]],[15,\"id\",\"ember-welcome-page-id-selector\"],[16,\"data-ember-version\",[34,[[26,[\"emberVersion\"]]]]],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"columns\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"tomster\"],[13],[0,\"\\n      \"],[11,\"img\",[]],[15,\"src\",\"ember-welcome-page/images/construction.png\"],[15,\"alt\",\"Under construction\"],[13],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"welcome\"],[13],[0,\"\\n      \"],[11,\"h2\",[]],[15,\"id\",\"title\"],[13],[0,\"Congratulations, you made it!\"],[14],[0,\"\\n\\n      \"],[11,\"p\",[]],[13],[0,\"You’ve officially spun up your very first Ember app :-)\"],[14],[0,\"\\n      \"],[11,\"p\",[]],[13],[0,\"You’ve got one more decision to make: what do you want to do next? We’d suggest one of the following to help you get going:\"],[14],[0,\"\\n      \"],[11,\"ol\",[]],[13],[0,\"\\n        \"],[11,\"li\",[]],[13],[11,\"a\",[]],[16,\"href\",[34,[\"https://guides.emberjs.com/v\",[26,[\"emberVersion\"]],\"/getting-started/quick-start/\"]]],[13],[0,\"Quick Start\"],[14],[0,\" - a quick introduction to how Ember works. Learn about defining your first route, writing a UI component and deploying your application.\"],[14],[0,\"\\n        \"],[11,\"li\",[]],[13],[11,\"a\",[]],[16,\"href\",[34,[\"https://guides.emberjs.com/v\",[26,[\"emberVersion\"]],\"/tutorial/ember-cli/\"]]],[13],[0,\"Ember Guides\"],[14],[0,\" - this is our more thorough, hands-on intro to Ember. Your crash course in Ember philosophy, background and some in-depth discussion of how things work (and why they work the way they do).\"],[14],[0,\"\\n      \"],[14],[0,\"\\n      \"],[11,\"p\",[]],[13],[0,\"If you run into problems, you can check \"],[11,\"a\",[]],[15,\"href\",\"http://stackoverflow.com/questions/tagged/ember.js\"],[13],[0,\"Stack Overflow\"],[14],[0,\" or \"],[11,\"a\",[]],[15,\"href\",\"http://discuss.emberjs.com/\"],[13],[0,\"our forums\"],[14],[0,\"  for ideas and answers—someone’s probably been through the same thing and already posted an answer.  If not, you can post your \"],[11,\"strong\",[]],[13],[0,\"own\"],[14],[0,\" question. People love to help new Ember developers get started, and our community is incredibly supportive \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n    \"],[11,\"p\",[]],[15,\"class\",\"postscript\"],[13],[0,\"To remove this welcome message, remove the \"],[11,\"code\",[]],[13],[0,\"{{welcome-page}}\"],[14],[0,\" component from your \"],[11,\"code\",[]],[13],[0,\"application.hbs\"],[14],[0,\" file.\"],[11,\"br\",[]],[13],[14],[0,\"You'll see this page update soon after!\"],[14],[0,\"\\n\"],[14],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "ember-welcome-page/templates/components/welcome-page.hbs" } });
+});
+;define('ember-wormhole/components/ember-wormhole', ['exports', 'ember-wormhole/templates/components/ember-wormhole', 'ember-wormhole/utils/dom'], function (exports, _emberWormhole, _dom) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Component.extend({
+    layout: _emberWormhole.default,
+
+    /*
+     * Attrs
+     */
+    to: Ember.computed.alias('destinationElementId'),
+    destinationElementId: null,
+    destinationElement: Ember.computed('destinationElementId', 'renderInPlace', function () {
+      var renderInPlace = this.get('renderInPlace');
+      if (renderInPlace) {
+        return this._element;
+      }
+      var id = this.get('destinationElementId');
+      if (!id) {
+        return null;
+      }
+      return (0, _dom.findElementById)(this._dom, id);
+    }),
+    renderInPlace: false,
+
+    /*
+     * Lifecycle
+     */
+    init: function init() {
+      var _this = this;
+
+      this._super.apply(this, arguments);
+
+      this._dom = (0, _dom.getDOM)(this);
+
+      // Create text nodes used for the head, tail
+      this._wormholeHeadNode = this._dom.createTextNode('');
+      this._wormholeTailNode = this._dom.createTextNode('');
+
+      /*
+       * didInsertElement does not fire in Fastboot, so we schedule this in
+       * init to be run after render. Importantly, we want to run
+       * appendToDestination after the child nodes have rendered.
+       */
+      Ember.run.schedule('afterRender', function () {
+        if (_this.isDestroyed) {
+          return;
+        }
+        _this._element = _this._wormholeHeadNode.parentNode;
+        if (!_this._element) {
+          throw new Error('The head node of a wormhole must be attached to the DOM');
+        }
+        _this._appendToDestination();
+      });
+    },
+
+
+    willDestroyElement: function willDestroyElement() {
+      var _this2 = this;
+
+      // not called in fastboot
+      this._super.apply(this, arguments);
+      var _wormholeHeadNode = this._wormholeHeadNode,
+          _wormholeTailNode = this._wormholeTailNode;
+
+      Ember.run.schedule('render', function () {
+        _this2._removeRange(_wormholeHeadNode, _wormholeTailNode);
+      });
+    },
+
+    _destinationDidChange: Ember.observer('destinationElement', function () {
+      var destinationElement = this._getDestinationElement();
+      if (destinationElement !== this._wormholeHeadNode.parentNode) {
+        Ember.run.schedule('render', this, '_appendToDestination');
+      }
+    }),
+
+    _appendToDestination: function _appendToDestination() {
+      var destinationElement = this._getDestinationElement();
+      if (!destinationElement) {
+        var destinationElementId = this.get('destinationElementId');
+        if (destinationElementId) {
+          throw new Error('ember-wormhole failed to render into \'#' + destinationElementId + '\' because the element is not in the DOM');
+        }
+        throw new Error('ember-wormhole failed to render content because the destinationElementId was set to an undefined or falsy value.');
+      }
+
+      var startingActiveElement = (0, _dom.getActiveElement)();
+      this._appendRange(destinationElement, this._wormholeHeadNode, this._wormholeTailNode);
+      var resultingActiveElement = (0, _dom.getActiveElement)();
+      if (startingActiveElement && resultingActiveElement !== startingActiveElement) {
+        startingActiveElement.focus();
+      }
+    },
+    _appendRange: function _appendRange(destinationElement, firstNode, lastNode) {
+      while (firstNode) {
+        destinationElement.insertBefore(firstNode, null);
+        firstNode = firstNode !== lastNode ? lastNode.parentNode.firstChild : null;
+      }
+    },
+    _removeRange: function _removeRange(firstNode, lastNode) {
+      var node = lastNode;
+      do {
+        var next = node.previousSibling;
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+          if (node === firstNode) {
+            break;
+          }
+        }
+        node = next;
+      } while (node);
+    },
+    _getDestinationElement: function _getDestinationElement() {
+      var renderInPlace = this.get('renderInPlace');
+      if (renderInPlace) {
+        return this._element;
+      }
+      return this.get('destinationElement');
+    }
+  });
+});
+;define("ember-wormhole/templates/components/ember-wormhole", ["exports"], function (exports) {
+  "use strict";
+
+  exports.__esModule = true;
+  exports.default = Ember.HTMLBars.template({ "id": "kfOuAXbY", "block": "{\"statements\":[[1,[33,[\"unbound\"],[[28,[\"_wormholeHeadNode\"]]],null],false],[18,\"default\"],[1,[33,[\"unbound\"],[[28,[\"_wormholeTailNode\"]]],null],false]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "ember-wormhole/templates/components/ember-wormhole.hbs" } });
+});
+;define('ember-wormhole/utils/dom', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getActiveElement = getActiveElement;
+  exports.findElementById = findElementById;
+  exports.getDOM = getDOM;
+  function getActiveElement() {
+    if (typeof document === 'undefined') {
+      return null;
+    } else {
+      return document.activeElement;
+    }
+  } /*
+     * Implement some helpers methods for interacting with the DOM,
+     * be it Fastboot's SimpleDOM or the browser's version.
+     */
+
+  function childNodesOfElement(element) {
+    var children = [];
+    var child = element.firstChild;
+    while (child) {
+      children.push(child);
+      child = child.nextSibling;
+    }
+    return children;
+  }
+
+  function findElementById(doc, id) {
+    if (doc.getElementById) {
+      return doc.getElementById(id);
+    }
+
+    var nodes = childNodesOfElement(doc);
+    var node = void 0;
+
+    while (nodes.length) {
+      node = nodes.shift();
+
+      if (node.getAttribute && node.getAttribute('id') === id) {
+        return node;
+      }
+
+      nodes = childNodesOfElement(node).concat(nodes);
+    }
+  }
+
+  // Private Ember API usage. Get the dom implementation used by the current
+  // renderer, be it native browser DOM or Fastboot SimpleDOM
+  function getDOM(context) {
+    var renderer = context.renderer;
+
+    if (!renderer._dom) {
+      // pre glimmer2
+      var container = Ember.getOwner ? Ember.getOwner(context) : context.container;
+      var documentService = container.lookup('service:-document');
+
+      if (documentService) {
+        return documentService;
+      }
+
+      renderer = container.lookup('renderer:-dom');
+    }
+
+    if (renderer._dom && renderer._dom.document) {
+      // pre Ember 2.6
+      return renderer._dom.document;
+    } else {
+      throw new Error('ember-wormhole could not get DOM');
+    }
+  }
 });
 ;define('ember-data/-debug/index', ['exports'], function (exports) {
   'use strict';
