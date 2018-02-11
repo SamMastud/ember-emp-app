@@ -823,6 +823,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("emp-app/app")["default"].create({"name":"emp-app","version":"0.0.0+ebc836e4"});
+  require("emp-app/app")["default"].create({"name":"emp-app","version":"0.0.0+df4852ac"});
 }
 //# sourceMappingURL=emp-app.map

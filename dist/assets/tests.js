@@ -93,14 +93,12 @@ define('emp-app/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'emp-
         var _this = this;
 
         var afterEach = options.afterEach && options.afterEach.apply(this, arguments);
-        return Promise.resolve(afterEach).then(function () {
+        return Ember.RSVP.Promise.resolve(afterEach).then(function () {
           return (0, _destroyApp.default)(_this.application);
         });
       }
     });
   };
-
-  var Promise = Ember.RSVP.Promise;
 });
 define('emp-app/tests/helpers/resolver', ['exports', 'emp-app/resolver', 'emp-app/config/environment'], function (exports, _resolver, _environment) {
   'use strict';

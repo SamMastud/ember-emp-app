@@ -70203,10 +70203,6 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.default = validateCollection;
-  var get = Ember.get,
-      assert = Ember.assert,
-      isArray = Ember.isArray,
-      isPresent = Ember.isPresent;
 
 
   /**
@@ -70223,15 +70219,16 @@ define("ember-resolver/features", [], function () {
     * @param {String} attribute
     */
   function validateCollection(value, options, model, attribute) {
-    var collection = get(options, 'collection');
+    var collection = Ember.get(options, 'collection');
 
-    assert('[validator:collection] [' + attribute + '] option \'collection\' is required', isPresent(collection));
+    (true && !(Ember.isPresent(collection)) && Ember.assert('[validator:collection] [' + attribute + '] option \'collection\' is required', Ember.isPresent(collection)));
 
-    if (collection === true && !isArray(value)) {
+
+    if (collection === true && !Ember.isArray(value)) {
       return (0, _validationError.default)('collection', value, options);
     }
 
-    if (collection === false && isArray(value)) {
+    if (collection === false && Ember.isArray(value)) {
       return (0, _validationError.default)('singular', value, options);
     }
 
@@ -70245,11 +70242,6 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.default = validateConfirmation;
-  var get = Ember.get,
-      assert = Ember.assert,
-      isEqual = Ember.isEqual,
-      isEmpty = Ember.isEmpty,
-      isPresent = Ember.isPresent;
 
 
   /**
@@ -70267,16 +70259,17 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validateConfirmation(value, options, model, attribute) {
-    var on = get(options, 'on');
-    var allowBlank = get(options, 'allowBlank');
+    var on = Ember.get(options, 'on');
+    var allowBlank = Ember.get(options, 'allowBlank');
 
-    assert('[validator:confirmation] [' + attribute + '] option \'on\' is required', isPresent(on));
+    (true && !(Ember.isPresent(on)) && Ember.assert('[validator:confirmation] [' + attribute + '] option \'on\' is required', Ember.isPresent(on)));
 
-    if (allowBlank && isEmpty(value)) {
+
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
-    if (!isEqual(value, get(model, on))) {
+    if (!Ember.isEqual(value, Ember.get(model, on))) {
       return (0, _validationError.default)('confirmation', value, options);
     }
 
@@ -70293,21 +70286,11 @@ define("ember-resolver/features", [], function () {
   exports.parseDate = parseDate;
 
 
-  var moment = (0, _emberRequireModule.default)('moment'); /**
-                                                            * Copyright 2016, Yahoo! Inc.
-                                                            * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
-                                                            */
+  var moment = (0, _emberRequireModule.default)('moment');
 
   if (!moment) {
     throw new Error('MomentJS is required to use the Date validator.');
   }
-
-  var getWithDefault = Ember.getWithDefault,
-      getProperties = Ember.getProperties,
-      isNone = Ember.isNone,
-      isEmpty = Ember.isEmpty,
-      set = Ember.set;
-
 
   /**
    * @class Date
@@ -70331,22 +70314,22 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validateDate(value, options) {
-    var errorFormat = getWithDefault(options, 'errorFormat', 'MMM Do, YYYY');
+    var errorFormat = Ember.getWithDefault(options, 'errorFormat', 'MMM Do, YYYY');
 
-    var _getProperties = getProperties(options, ['format', 'precision', 'allowBlank']),
-        format = _getProperties.format,
-        precision = _getProperties.precision,
-        allowBlank = _getProperties.allowBlank;
+    var _EmberGetProperties = Ember.getProperties(options, ['format', 'precision', 'allowBlank']),
+        format = _EmberGetProperties.format,
+        precision = _EmberGetProperties.precision,
+        allowBlank = _EmberGetProperties.allowBlank;
 
-    var _getProperties2 = getProperties(options, ['before', 'onOrBefore', 'after', 'onOrAfter']),
-        before = _getProperties2.before,
-        onOrBefore = _getProperties2.onOrBefore,
-        after = _getProperties2.after,
-        onOrAfter = _getProperties2.onOrAfter;
+    var _EmberGetProperties2 = Ember.getProperties(options, ['before', 'onOrBefore', 'after', 'onOrAfter']),
+        before = _EmberGetProperties2.before,
+        onOrBefore = _EmberGetProperties2.onOrBefore,
+        after = _EmberGetProperties2.after,
+        onOrAfter = _EmberGetProperties2.onOrAfter;
 
     var date = void 0;
 
-    if (allowBlank && isEmpty(value)) {
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
@@ -70365,7 +70348,7 @@ define("ember-resolver/features", [], function () {
     if (before) {
       before = parseDate(before, format);
       if (!date.isBefore(before, precision)) {
-        set(options, 'before', before.format(errorFormat));
+        Ember.set(options, 'before', before.format(errorFormat));
         return (0, _validationError.default)('before', value, options);
       }
     }
@@ -70373,7 +70356,7 @@ define("ember-resolver/features", [], function () {
     if (onOrBefore) {
       onOrBefore = parseDate(onOrBefore, format);
       if (!date.isSameOrBefore(onOrBefore, precision)) {
-        set(options, 'onOrBefore', onOrBefore.format(errorFormat));
+        Ember.set(options, 'onOrBefore', onOrBefore.format(errorFormat));
         return (0, _validationError.default)('onOrBefore', value, options);
       }
     }
@@ -70381,7 +70364,7 @@ define("ember-resolver/features", [], function () {
     if (after) {
       after = parseDate(after, format);
       if (!date.isAfter(after, precision)) {
-        set(options, 'after', after.format(errorFormat));
+        Ember.set(options, 'after', after.format(errorFormat));
         return (0, _validationError.default)('after', value, options);
       }
     }
@@ -70389,7 +70372,7 @@ define("ember-resolver/features", [], function () {
     if (onOrAfter) {
       onOrAfter = parseDate(onOrAfter, format);
       if (!date.isSameOrAfter(onOrAfter, precision)) {
-        set(options, 'onOrAfter', onOrAfter.format(errorFormat));
+        Ember.set(options, 'onOrAfter', onOrAfter.format(errorFormat));
         return (0, _validationError.default)('onOrAfter', value, options);
       }
     }
@@ -70400,11 +70383,11 @@ define("ember-resolver/features", [], function () {
   function parseDate(date, format) {
     var useStrict = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-    if (date === 'now' || isEmpty(date)) {
+    if (date === 'now' || Ember.isEmpty(date)) {
       return moment();
     }
 
-    return isNone(format) ? moment(new Date(date)) : moment(date, format, useStrict);
+    return Ember.isNone(format) ? moment(new Date(date)) : moment(date, format, useStrict);
   }
 });
 ;define('ember-validators/ds-error', ['exports', 'ember-require-module', 'ember-validators/utils/validation-error'], function (exports, _emberRequireModule, _validationError) {
@@ -70417,18 +70400,7 @@ define("ember-resolver/features", [], function () {
   exports.getPathAndKey = getPathAndKey;
 
 
-  var DS = (0, _emberRequireModule.default)('ember-data'); /**
-                                                            * Copyright 2016, Yahoo! Inc.
-                                                            * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
-                                                            */
-
-  if (!DS) {
-    throw new Error('Ember-Data is required to use the DS Error validator.');
-  }
-
-  var get = Ember.get,
-      isNone = Ember.isNone;
-
+  var DS = (0, _emberRequireModule.default)('ember-data');
 
   /**
    *  @class DS Error
@@ -70443,14 +70415,18 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validateDsError(value, options, model, attribute) {
+    if (!DS) {
+      throw new Error('Ember-Data is required to use the DS Error validator.');
+    }
+
     var _getPathAndKey = getPathAndKey(attribute),
         path = _getPathAndKey.path,
         key = _getPathAndKey.key;
 
-    var errors = get(model, path);
+    var errors = Ember.get(model, path);
 
-    if (!isNone(errors) && errors instanceof DS.Errors && errors.has(key)) {
-      return (0, _validationError.default)('ds', null, options, get(errors.errorsFor(key), 'lastObject.message'));
+    if (!Ember.isNone(errors) && errors instanceof DS.Errors && errors.has(key)) {
+      return (0, _validationError.default)('ds', null, options, Ember.get(errors.errorsFor(key), 'lastObject.message'));
     }
 
     return true;
@@ -70511,13 +70487,6 @@ define("ember-resolver/features", [], function () {
     };
   }();
 
-  var get = Ember.get,
-      typeOf = Ember.typeOf,
-      isEmpty = Ember.isEmpty,
-      assert = Ember.assert,
-      getProperties = Ember.getProperties;
-
-
   /**
    *  @class Exclusion
    *  @module Validators
@@ -70534,15 +70503,16 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validateExclusion(value, options, model, attribute) {
-    var array = get(options, 'in');
+    var array = Ember.get(options, 'in');
 
-    var _getProperties = getProperties(options, ['range', 'allowBlank']),
-        range = _getProperties.range,
-        allowBlank = _getProperties.allowBlank;
+    var _EmberGetProperties = Ember.getProperties(options, ['range', 'allowBlank']),
+        range = _EmberGetProperties.range,
+        allowBlank = _EmberGetProperties.allowBlank;
 
-    assert('[validator:exclusion] [' + attribute + '] no options were passed in', !isEmpty(Object.keys(options)));
+    (true && !(!Ember.isEmpty(Object.keys(options))) && Ember.assert('[validator:exclusion] [' + attribute + '] no options were passed in', !Ember.isEmpty(Object.keys(options))));
 
-    if (allowBlank && isEmpty(value)) {
+
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
@@ -70555,7 +70525,7 @@ define("ember-resolver/features", [], function () {
           min = _range[0],
           max = _range[1];
 
-      var equalType = typeOf(value) === typeOf(min) && typeOf(value) === typeOf(max);
+      var equalType = Ember.typeOf(value) === Ember.typeOf(min) && Ember.typeOf(value) === Ember.typeOf(max);
 
       if (equalType && min <= value && value <= max) {
         return (0, _validationError.default)('exclusion', value, options);
@@ -70573,12 +70543,7 @@ define("ember-resolver/features", [], function () {
   });
   exports.regularExpressions = undefined;
   exports.default = validateFormat;
-  var set = Ember.set,
-      isNone = Ember.isNone,
-      isEmpty = Ember.isEmpty,
-      assert = Ember.assert,
-      canInvoke = Ember.canInvoke,
-      getProperties = Ember.getProperties;
+  var canInvoke = Ember.canInvoke;
 
 
   /**
@@ -70600,22 +70565,26 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   var regularExpressions = exports.regularExpressions = {
+    // eslint-disable-next-line no-useless-escape
     email: /^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i,
+    // eslint-disable-next-line no-useless-escape
     phone: /^([\+]?1\s*[-\/\.]?\s*)?(\((\d{3})\)|(\d{3}))\s*[-\/\.]?\s*(\d{3})\s*[-\/\.]?\s*(\d{4})\s*(([xX]|[eE][xX][tT]?[\.]?|extension)\s*([#*\d]+))*$/,
+    // eslint-disable-next-line no-useless-escape
     url: /(?:([A-Za-z]+):)?(\/{0,3})[a-zA-Z0-9][a-zA-Z-0-9]*(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-{}]*[\w@?^=%&amp;\/~+#-{}])??/
   };
 
   function validateFormat(value, options, model, attribute) {
-    var _getProperties = getProperties(options, ['regex', 'type', 'inverse', 'allowBlank']),
-        regex = _getProperties.regex,
-        type = _getProperties.type,
-        _getProperties$invers = _getProperties.inverse,
-        inverse = _getProperties$invers === undefined ? false : _getProperties$invers,
-        allowBlank = _getProperties.allowBlank;
+    var _EmberGetProperties = Ember.getProperties(options, ['regex', 'type', 'inverse', 'allowBlank']),
+        regex = _EmberGetProperties.regex,
+        type = _EmberGetProperties.type,
+        _EmberGetProperties$i = _EmberGetProperties.inverse,
+        inverse = _EmberGetProperties$i === undefined ? false : _EmberGetProperties$i,
+        allowBlank = _EmberGetProperties.allowBlank;
 
-    assert('[validator:format] [' + attribute + '] no options were passed in', !isEmpty(Object.keys(options)));
+    (true && !(!Ember.isEmpty(Object.keys(options))) && Ember.assert('[validator:format] [' + attribute + '] no options were passed in', !Ember.isEmpty(Object.keys(options))));
 
-    if (allowBlank && isEmpty(value)) {
+
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
@@ -70628,10 +70597,10 @@ define("ember-resolver/features", [], function () {
         regex = formatEmailRegex(options);
       }
 
-      set(options, 'regex', regex);
+      Ember.set(options, 'regex', regex);
     }
 
-    if (!canInvoke(value, 'match') || regex && isEmpty(value.match(regex)) !== inverse) {
+    if (!canInvoke(value, 'match') || regex && Ember.isEmpty(value.match(regex)) !== inverse) {
       return (0, _validationError.default)(type || 'invalid', value, options);
     }
 
@@ -70641,11 +70610,11 @@ define("ember-resolver/features", [], function () {
   function formatEmailRegex(options) {
     var source = regularExpressions.email.source;
 
-    var _getProperties2 = getProperties(options, ['allowNonTld', 'minTldLength']),
-        allowNonTld = _getProperties2.allowNonTld,
-        minTldLength = _getProperties2.minTldLength;
+    var _EmberGetProperties2 = Ember.getProperties(options, ['allowNonTld', 'minTldLength']),
+        allowNonTld = _EmberGetProperties2.allowNonTld,
+        minTldLength = _EmberGetProperties2.minTldLength;
 
-    if (!isNone(minTldLength) && typeof minTldLength === 'number') {
+    if (!Ember.isNone(minTldLength) && typeof minTldLength === 'number') {
       source = source.replace('[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$', '[a-z0-9]{' + minTldLength + ',}(?:[a-z0-9-]*[a-z0-9])?$');
     }
 
@@ -70702,13 +70671,6 @@ define("ember-resolver/features", [], function () {
     };
   }();
 
-  var get = Ember.get,
-      typeOf = Ember.typeOf,
-      assert = Ember.assert,
-      isEmpty = Ember.isEmpty,
-      getProperties = Ember.getProperties;
-
-
   /**
    *  @class Inclusion
    *  @module Validators
@@ -70725,15 +70687,16 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validateInclusion(value, options, model, attribute) {
-    var array = get(options, 'in');
+    var array = Ember.get(options, 'in');
 
-    var _getProperties = getProperties(options, ['range', 'allowBlank']),
-        range = _getProperties.range,
-        allowBlank = _getProperties.allowBlank;
+    var _EmberGetProperties = Ember.getProperties(options, ['range', 'allowBlank']),
+        range = _EmberGetProperties.range,
+        allowBlank = _EmberGetProperties.allowBlank;
 
-    assert('[validator:inclusion] [' + attribute + '] no options were passed in', !isEmpty(Object.keys(options)));
+    (true && !(!Ember.isEmpty(Object.keys(options))) && Ember.assert('[validator:inclusion] [' + attribute + '] no options were passed in', !Ember.isEmpty(Object.keys(options))));
 
-    if (allowBlank && isEmpty(value)) {
+
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
@@ -70746,7 +70709,7 @@ define("ember-resolver/features", [], function () {
           min = _range[0],
           max = _range[1];
 
-      var equalType = typeOf(value) === typeOf(min) && typeOf(value) === typeOf(max);
+      var equalType = Ember.typeOf(value) === Ember.typeOf(min) && Ember.typeOf(value) === Ember.typeOf(max);
 
       if (!equalType || min > value || value > max) {
         return (0, _validationError.default)('inclusion', value, options);
@@ -70763,12 +70726,10 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.validate = validate;
-  var assert = Ember.assert,
-      isPresent = Ember.isPresent;
   function validate(type) {
     var validator = (0, _emberRequireModule.default)('ember-validators/' + type);
 
-    assert('Validator not found of type: ' + type + '.', isPresent(validator));
+    (true && !(Ember.isPresent(validator)) && Ember.assert('Validator not found of type: ' + type + '.', Ember.isPresent(validator)));
 
     for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       args[_key - 1] = arguments[_key];
@@ -70784,10 +70745,6 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.default = validateLength;
-  var get = Ember.get,
-      isNone = Ember.isNone,
-      isEmpty = Ember.isEmpty,
-      getProperties = Ember.getProperties;
 
 
   /**
@@ -70809,38 +70766,38 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validateLength(value, options) {
-    var _getProperties = getProperties(options, ['allowNone', 'allowBlank', 'useBetweenMessage', 'is', 'min', 'max']),
-        _getProperties$allowN = _getProperties.allowNone,
-        allowNone = _getProperties$allowN === undefined ? true : _getProperties$allowN,
-        allowBlank = _getProperties.allowBlank,
-        useBetweenMessage = _getProperties.useBetweenMessage,
-        is = _getProperties.is,
-        min = _getProperties.min,
-        max = _getProperties.max;
+    var _EmberGetProperties = Ember.getProperties(options, ['allowNone', 'allowBlank', 'useBetweenMessage', 'is', 'min', 'max']),
+        _EmberGetProperties$a = _EmberGetProperties.allowNone,
+        allowNone = _EmberGetProperties$a === undefined ? true : _EmberGetProperties$a,
+        allowBlank = _EmberGetProperties.allowBlank,
+        useBetweenMessage = _EmberGetProperties.useBetweenMessage,
+        is = _EmberGetProperties.is,
+        min = _EmberGetProperties.min,
+        max = _EmberGetProperties.max;
 
-    if (isNone(value)) {
+    if (Ember.isNone(value)) {
       return allowNone ? true : (0, _validationError.default)('invalid', value, options);
     }
 
-    if (allowBlank && isEmpty(value)) {
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
-    var length = get(value, 'length');
+    var length = Ember.get(value, 'length');
 
-    if (!isNone(is) && is !== length) {
+    if (!Ember.isNone(is) && is !== length) {
       return (0, _validationError.default)('wrongLength', value, options);
     }
 
-    if (useBetweenMessage && !isNone(min) && !isNone(max) && (length < min || length > max)) {
+    if (useBetweenMessage && !Ember.isNone(min) && !Ember.isNone(max) && (length < min || length > max)) {
       return (0, _validationError.default)('between', value, options);
     }
 
-    if (!isNone(min) && min > length) {
+    if (!Ember.isNone(min) && min > length) {
       return (0, _validationError.default)('tooShort', value, options);
     }
 
-    if (!isNone(max) && max < length) {
+    if (!Ember.isNone(max) && max < length) {
       return (0, _validationError.default)('tooLong', value, options);
     }
 
@@ -70853,8 +70810,6 @@ define("ember-resolver/features", [], function () {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  var get = Ember.get,
-      isNone = Ember.isNone;
   exports.default = {
     /**
      * Regex for matching error message placeholders
@@ -70882,7 +70837,7 @@ define("ember-resolver/features", [], function () {
     getDescriptionFor: function getDescriptionFor(attribute) {
       var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      return get(context, 'description') || get(this, 'defaultDescription');
+      return Ember.get(context, 'description') || Ember.get(this, 'defaultDescription');
     },
 
 
@@ -70896,7 +70851,7 @@ define("ember-resolver/features", [], function () {
     getMessageFor: function getMessageFor(type) {
       var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      return this.formatMessage(get(this, type), context);
+      return this.formatMessage(Ember.get(this, type), context);
     },
 
 
@@ -70912,11 +70867,11 @@ define("ember-resolver/features", [], function () {
 
       var m = message;
 
-      if (isNone(m) || typeof m !== 'string') {
-        m = get(this, 'invalid');
+      if (Ember.isNone(m) || typeof m !== 'string') {
+        m = Ember.get(this, 'invalid');
       }
-      return m.replace(get(this, '_regex'), function (s, attr) {
-        return get(context, attr);
+      return m.replace(Ember.get(this, '_regex'), function (s, attr) {
+        return Ember.get(context, attr);
       });
     },
 
@@ -70968,10 +70923,6 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.default = validateNumber;
-  var get = Ember.get,
-      isNone = Ember.isNone,
-      isEmpty = Ember.isEmpty,
-      getProperties = Ember.getProperties;
 
 
   /**
@@ -71003,22 +70954,22 @@ define("ember-resolver/features", [], function () {
     var numValue = Number(value);
     var optionKeys = Object.keys(options);
 
-    var _getProperties = getProperties(options, ['allowBlank', 'allowNone', 'allowString', 'integer']),
-        allowBlank = _getProperties.allowBlank,
-        _getProperties$allowN = _getProperties.allowNone,
-        allowNone = _getProperties$allowN === undefined ? true : _getProperties$allowN,
-        allowString = _getProperties.allowString,
-        integer = _getProperties.integer;
+    var _EmberGetProperties = Ember.getProperties(options, ['allowBlank', 'allowNone', 'allowString', 'integer']),
+        allowBlank = _EmberGetProperties.allowBlank,
+        _EmberGetProperties$a = _EmberGetProperties.allowNone,
+        allowNone = _EmberGetProperties$a === undefined ? true : _EmberGetProperties$a,
+        allowString = _EmberGetProperties.allowString,
+        integer = _EmberGetProperties.integer;
 
-    if (!allowNone && isNone(value)) {
+    if (!allowNone && Ember.isNone(value)) {
       return (0, _validationError.default)('notANumber', value, options);
     }
 
-    if (allowBlank && isEmpty(value)) {
+    if (allowBlank && Ember.isEmpty(value)) {
       return true;
     }
 
-    if (typeof value === 'string' && (isEmpty(value) || !allowString)) {
+    if (typeof value === 'string' && (Ember.isEmpty(value) || !allowString)) {
       return (0, _validationError.default)('notANumber', value, options);
     }
 
@@ -71043,7 +70994,7 @@ define("ember-resolver/features", [], function () {
   }
 
   function _validateType(type, options, value) {
-    var expected = get(options, type);
+    var expected = Ember.get(options, type);
     var actual = value;
 
     if (type === 'is' && actual !== expected) {
@@ -71088,10 +71039,6 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.default = validatePresence;
-  var assert = Ember.assert,
-      isEmpty = Ember.isEmpty,
-      isPresent = Ember.isPresent,
-      getProperties = Ember.getProperties;
 
 
   /**
@@ -71110,14 +71057,15 @@ define("ember-resolver/features", [], function () {
    * @param {String} attribute
    */
   function validatePresence(value, options, model, attribute) {
-    var _getProperties = getProperties(options, ['presence', 'ignoreBlank']),
-        presence = _getProperties.presence,
-        ignoreBlank = _getProperties.ignoreBlank;
+    var _EmberGetProperties = Ember.getProperties(options, ['presence', 'ignoreBlank']),
+        presence = _EmberGetProperties.presence,
+        ignoreBlank = _EmberGetProperties.ignoreBlank;
 
     var v = (0, _unwrapProxy.default)(value);
-    var _isPresent = ignoreBlank ? isPresent(v) : !isEmpty(v);
+    var _isPresent = ignoreBlank ? Ember.isPresent(v) : !Ember.isEmpty(v);
 
-    assert('[validator:presence] [' + attribute + '] option \'presence\' is required', isPresent(presence));
+    (true && !(Ember.isPresent(presence)) && Ember.assert('[validator:presence] [' + attribute + '] option \'presence\' is required', Ember.isPresent(presence)));
+
 
     if (presence === true && !_isPresent) {
       return (0, _validationError.default)('blank', value, options);
@@ -71150,9 +71098,8 @@ define("ember-resolver/features", [], function () {
   });
   exports.default = unwrapProxy;
   exports.isProxy = isProxy;
-  var get = Ember.get;
   function unwrapProxy(o) {
-    return isProxy(o) ? unwrapProxy(get(o, 'content')) : o;
+    return isProxy(o) ? unwrapProxy(Ember.get(o, 'content')) : o;
   }
 
   function isProxy(o) {
@@ -71166,11 +71113,6 @@ define("ember-resolver/features", [], function () {
     value: true
   });
   exports.default = validationError;
-  /**
-   * Copyright 2016, Yahoo! Inc.
-   * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
-   */
-
   function validationError(type, value, context, message) {
     return { type: type, value: value, context: context, message: message };
   }

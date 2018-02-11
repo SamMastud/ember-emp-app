@@ -8600,32 +8600,13 @@ define('@ember/test-helpers/settled', ['exports', '@ember/test-helpers/-utils', 
     @returns {boolean} `true` if settled, `false` otherwise
   */
   function isSettled() {
-    var waitForTimers = true;
-    var waitForAJAX = true;
-    var waitForWaiters = true;
-
-    if (arguments[0] !== undefined) {
-      var options = arguments[0];
-      waitForTimers = 'waitForTimers' in options ? options.waitForTimers : true;
-      waitForAJAX = 'waitForAJAX' in options ? options.waitForAJAX : true;
-      waitForWaiters = 'waitForWaiters' in options ? options.waitForWaiters : true;
-    }
-
     var _getSettledState = getSettledState(),
         hasPendingTimers = _getSettledState.hasPendingTimers,
         hasRunLoop = _getSettledState.hasRunLoop,
         hasPendingRequests = _getSettledState.hasPendingRequests,
         hasPendingWaiters = _getSettledState.hasPendingWaiters;
 
-    if (waitForTimers && (hasPendingTimers || hasRunLoop)) {
-      return false;
-    }
-
-    if (waitForAJAX && hasPendingRequests) {
-      return false;
-    }
-
-    if (waitForWaiters && hasPendingWaiters) {
+    if (hasPendingTimers || hasRunLoop || hasPendingRequests || hasPendingWaiters) {
       return false;
     }
 
@@ -8640,11 +8621,7 @@ define('@ember/test-helpers/settled', ['exports', '@ember/test-helpers/-utils', 
     @returns {Promise<void>} resolves when settled
   */
   function settled() {
-    var options = arguments[0];
-
-    return (0, _waitUntil.default)(function () {
-      return isSettled(options);
-    }, { timeout: Infinity });
+    return (0, _waitUntil.default)(isSettled, { timeout: Infinity });
   }
 });
 define('@ember/test-helpers/setup-application-context', ['exports', '@ember/test-helpers/-utils', '@ember/test-helpers/setup-context', '@ember/test-helpers/has-ember-version', '@ember/test-helpers/settled'], function (exports, _utils, _setupContext, _hasEmberVersion, _settled) {
@@ -8675,7 +8652,11 @@ define('@ember/test-helpers/setup-application-context', ['exports', '@ember/test
     return (0, _utils.nextTickPromise)().then(function () {
       return owner.visit.apply(owner, _arguments);
     }).then(function () {
-      context.element = document.querySelector('#ember-testing > .ember-view');
+      if (EmberENV._APPLICATION_TEMPLATE_WRAPPER !== false) {
+        context.element = document.querySelector('#ember-testing > .ember-view');
+      } else {
+        context.element = document.querySelector('#ember-testing');
+      }
     }).then(_settled.default);
   }
 
@@ -8683,6 +8664,7 @@ define('@ember/test-helpers/setup-application-context', ['exports', '@ember/test
     @public
     @returns {string} the currently active route name
   */
+  /* globals EmberENV */
   function currentRouteName() {
     var _getContext = (0, _setupContext.getContext)(),
         owner = _getContext.owner;
@@ -8956,6 +8938,7 @@ define('@ember/test-helpers/setup-rendering-context', ['exports', '@ember/test-h
   exports.render = render;
   exports.clearRender = clearRender;
   exports.default = setupRenderingContext;
+  /* globals EmberENV */
   var RENDERING_CLEANUP = exports.RENDERING_CLEANUP = Object.create(null);
   var OUTLET_TEMPLATE = Ember.HTMLBars.template({
     "id": "+gA8IrnL",
@@ -9149,7 +9132,11 @@ define('@ember/test-helpers/setup-rendering-context', ['exports', '@ember/test-h
       // In older Ember versions (2.4) the element itself is not stable,
       // and therefore we cannot update the `this.element` until after the
       // rendering is completed
-      context.element = (0, _getRootElement.default)().querySelector('.ember-view');
+      if (EmberENV._APPLICATION_TEMPLATE_WRAPPER !== false) {
+        context.element = (0, _getRootElement.default)().querySelector('.ember-view');
+      } else {
+        context.element = (0, _getRootElement.default)();
+      }
 
       return context;
     });
@@ -11226,10 +11213,14 @@ define('ember-test-helpers/legacy-0-6-x/test-module-for-component', ['exports', 
         hasRendered = true;
       }
 
-      // ensure the element is based on the wrapping toplevel view
-      // Ember still wraps the main application template with a
-      // normal tagged view
-      context._element = element = document.querySelector('#ember-testing > .ember-view');
+      if (EmberENV._APPLICATION_TEMPLATE_WRAPPER !== false) {
+        // ensure the element is based on the wrapping toplevel view
+        // Ember still wraps the main application template with a
+        // normal tagged view
+        context._element = element = document.querySelector('#ember-testing > .ember-view');
+      } else {
+        context._element = element = document.querySelector('#ember-testing');
+      }
     };
 
     context.$ = function (selector) {
@@ -11798,18 +11789,13 @@ define('ember-test-helpers/legacy-0-6-x/test-module', ['exports', 'ember-test-he
 
   exports.default = _class;
 });
-define('ember-test-helpers/wait', ['exports', '@ember/test-helpers/settled'], function (exports, _settled) {
+define('ember-test-helpers/wait', ['exports', '@ember/test-helpers/settled', '@ember/test-helpers'], function (exports, _settled, _testHelpers) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _settled.default;
-    }
-  });
+  exports._teardownPromiseListeners = exports._teardownAJAXHooks = exports._setupPromiseListeners = exports._setupAJAXHooks = undefined;
   Object.defineProperty(exports, '_setupAJAXHooks', {
     enumerable: true,
     get: function () {
@@ -11834,6 +11820,59 @@ define('ember-test-helpers/wait', ['exports', '@ember/test-helpers/settled'], fu
       return _settled._teardownPromiseListeners;
     }
   });
+  exports.default = wait;
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+  /**
+    Returns a promise that resolves when in a settled state (see `isSettled` for
+    a definition of "settled state").
+  
+    @private
+    @deprecated
+    @param {Object} [options={}] the options to be used for waiting
+    @param {boolean} [options.waitForTimers=true] should timers be waited upon
+    @param {boolean} [options.waitForAjax=true] should $.ajax requests be waited upon
+    @param {boolean} [options.waitForWaiters=true] should test waiters be waited upon
+    @returns {Promise<void>} resolves when settled
+  */
+  function wait() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object' || options === null) {
+      options = {};
+    }
+
+    return (0, _testHelpers.waitUntil)(function () {
+      var waitForTimers = 'waitForTimers' in options ? options.waitForTimers : true;
+      var waitForAJAX = 'waitForAJAX' in options ? options.waitForAJAX : true;
+      var waitForWaiters = 'waitForWaiters' in options ? options.waitForWaiters : true;
+
+      var _getSettledState = (0, _testHelpers.getSettledState)(),
+          hasPendingTimers = _getSettledState.hasPendingTimers,
+          hasRunLoop = _getSettledState.hasRunLoop,
+          hasPendingRequests = _getSettledState.hasPendingRequests,
+          hasPendingWaiters = _getSettledState.hasPendingWaiters;
+
+      if (waitForTimers && (hasPendingTimers || hasRunLoop)) {
+        return false;
+      }
+
+      if (waitForAJAX && hasPendingRequests) {
+        return false;
+      }
+
+      if (waitForWaiters && hasPendingWaiters) {
+        return false;
+      }
+
+      return true;
+    });
+  }
 });
 define("qunit/index", ["exports"], function (exports) {
   "use strict";
