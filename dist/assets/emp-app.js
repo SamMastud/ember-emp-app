@@ -8,7 +8,7 @@ define("emp-app/adapters/application", ["exports", "ember-data"], function (expo
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.default = _emberData.default.JSONAPIAdapter.extend({
+    exports.default = _emberData.default.RESTAdapter.extend({
         host: "http://localhost:3000"
     });
 });
@@ -173,28 +173,11 @@ define('emp-app/components/user-listing', ['exports'], function (exports) {
     exports.default = Ember.Component.extend({
         isWide: false,
         actions: {
-            toggleImageSize: function toggleImageSize() {
-                this.toggleProperty('isWide');
-            },
             toggleModal: function toggleModal() {
                 this.toggleProperty('isShowingModal');
             }
         }
-
     });
-});
-define('emp-app/components/welcome-page', ['exports', 'ember-welcome-page/components/welcome-page'], function (exports, _welcomePage) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _welcomePage.default;
-    }
-  });
 });
 define('emp-app/helpers/app-version', ['exports', 'emp-app/config/environment', 'ember-cli-app-version/utils/regexp'], function (exports, _environment, _regexp) {
   'use strict';
@@ -423,22 +406,28 @@ define("emp-app/instance-initializers/ember-data", ["exports", "ember-data/initi
     initialize: _initializeStoreService.default
   };
 });
-define('emp-app/models/user', ['exports', 'ember-data'], function (exports, _emberData) {
-    'use strict';
+define('emp-app/models/user', ['exports', 'ember-data', 'ember-cp-validations'], function (exports, _emberData, _emberCpValidations) {
+  'use strict';
 
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.default = _emberData.default.Model.extend({
-        name: _emberData.default.attr(),
-        type: _emberData.default.attr(),
-        age: _emberData.default.attr(),
-        city: _emberData.default.attr(),
-        status: _emberData.default.attr(),
-        image: _emberData.default.attr(),
-        email: _emberData.default.attr(),
-        address: _emberData.default.attr()
-    });
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  var Validations = (0, _emberCpValidations.buildValidations)({
+    username: (0, _emberCpValidations.validator)('presence', true),
+    email: [(0, _emberCpValidations.validator)('presence', true), (0, _emberCpValidations.validator)('format', { type: 'email' })]
+  });
+
+  exports.default = _emberData.default.Model.extend(Validations, {
+    name: _emberData.default.attr('string'),
+    age: _emberData.default.attr('string'),
+    city: _emberData.default.attr('string'),
+    status: _emberData.default.attr('string'),
+    image: _emberData.default.attr('string'),
+    email: _emberData.default.attr('string'),
+    address: _emberData.default.attr()
+  });
 });
 define('emp-app/resolver', ['exports', 'ember-resolver'], function (exports, _emberResolver) {
   'use strict';
@@ -521,7 +510,7 @@ define('emp-app/serializers/application', ['exports', 'ember-data'], function (e
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _emberData.default.JSONAPISerializer.extend({});
+  exports.default = _emberData.default.RESTSerializer.extend({});
 });
 define('emp-app/services/ajax', ['exports', 'ember-ajax/services/ajax'], function (exports, _ajax) {
   'use strict';
@@ -591,7 +580,7 @@ define("emp-app/templates/components/user-listing", ["exports"], function (expor
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "5qcyAyPo", "block": "{\"statements\":[[11,\"article\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n    \"],[11,\"img\",[]],[16,\"src\",[34,[[28,[\"user\",\"image\"]]]]],[15,\"alt\",\"\"],[13],[14],[0,\"    \\n  \"],[11,\"h4\",[]],[13],[1,[28,[\"user\",\"name\"]],false],[14],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n    \"],[11,\"span\",[]],[13],[0,\"Age:\"],[14],[0,\" \"],[1,[28,[\"user\",\"age\"]],false],[0,\"\\n  \"],[14],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n    \"],[11,\"span\",[]],[13],[0,\"status:\"],[14],[0,\" \"],[1,[28,[\"user\",\"status\"]],false],[0,\"\\n  \"],[14],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n    \"],[11,\"span\",[]],[13],[0,\"Location:\"],[14],[0,\" \"],[1,[28,[\"user\",\"city\"]],false],[0,\"\\n  \"],[14],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n    \"],[11,\"span\",[]],[13],[0,\"Email:\"],[14],[0,\" \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n  \"],[14],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n    \"],[11,\"button\",[]],[15,\"class\",\"button details-position\"],[5,[\"action\"],[[28,[null]],\"toggleModal\"]],[13],[0,\"See Details\"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\\n\\n\"],[6,[\"if\"],[[28,[\"isShowingModal\"]]],null,{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"targetAttachment\",\"translucentOverlay\"],[\"toggleModal\",\"center\",true]],{\"statements\":[[0,\"    \"],[11,\"div\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n        \"],[11,\"h3\",[]],[13],[0,\"Profile\"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Name:\"],[14],[0,\" \"],[1,[28,[\"user\",\"name\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Age:\"],[14],[0,\" \"],[1,[28,[\"user\",\"age\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"status:\"],[14],[0,\" \"],[1,[28,[\"user\",\"status\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Location:\"],[14],[0,\" \"],[1,[28,[\"user\",\"city\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Email:\"],[14],[0,\" \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"],[6,[\"each\"],[[28,[\"user\",\"address\"]]],null,{\"statements\":[[0,\"   \"],[11,\"div\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n       \"],[11,\"h3\",[]],[13],[1,[28,[\"address\",\"type\"]],false],[14],[0,\"\\n         \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Street:\"],[14],[0,\" \"],[1,[28,[\"address\",\"street\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Zip Code:\"],[14],[0,\" \"],[1,[28,[\"address\",\"pin-code\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"City:\"],[14],[0,\" \"],[1,[28,[\"address\",\"city\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Country:\"],[14],[0,\" \"],[1,[28,[\"address\",\"country\"]],false],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"]],\"locals\":[\"address\"]},null],[0,\"    \\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[0,\"\\n\"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "emp-app/templates/components/user-listing.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "l8oMNXSD", "block": "{\"statements\":[[0,\"\\n\\n\"],[11,\"div\",[]],[5,[\"action\"],[[28,[null]],\"toggleModal\"]],[13],[0,\"\\n    \"],[11,\"article\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"detail avatar\"],[13],[0,\"\\n        \"],[11,\"img\",[]],[16,\"src\",[34,[[28,[\"user\",\"image\"]]]]],[15,\"alt\",\"\"],[13],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n        \"],[11,\"span\",[]],[13],[1,[28,[\"user\",\"name\"]],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n        \"],[11,\"span\",[]],[13],[1,[28,[\"user\",\"status\"]],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"detail avatar\"],[13],[0,\"\\n        \"],[11,\"span\",[]],[13],[1,[28,[\"user\",\"age\"]],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n        \"],[11,\"span\",[]],[13],[1,[28,[\"user\",\"city\"]],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n        \"],[11,\"span\",[]],[13],[1,[28,[\"user\",\"email\"]],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"isShowingModal\"]]],null,{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"targetAttachment\",\"containerClass\"],[\"toggleModal\",\"center\",\"details\"]],{\"statements\":[[0,\"    \"],[11,\"div\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n        \"],[11,\"h3\",[]],[13],[0,\"Profile\"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Name:\"],[14],[0,\" \"],[1,[28,[\"user\",\"name\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Age:\"],[14],[0,\" \"],[1,[28,[\"user\",\"age\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"status:\"],[14],[0,\" \"],[1,[28,[\"user\",\"status\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Location:\"],[14],[0,\" \"],[1,[28,[\"user\",\"city\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Email:\"],[14],[0,\" \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"],[6,[\"each\"],[[28,[\"user\",\"address\"]]],null,{\"statements\":[[0,\"   \"],[11,\"div\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n       \"],[11,\"h3\",[]],[13],[1,[28,[\"address\",\"type\"]],false],[14],[0,\"\\n         \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Street:\"],[14],[0,\" \"],[1,[28,[\"address\",\"street\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Zip Code:\"],[14],[0,\" \"],[1,[28,[\"address\",\"pin-code\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"City:\"],[14],[0,\" \"],[1,[28,[\"address\",\"city\"]],false],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Country:\"],[14],[0,\" \"],[1,[28,[\"address\",\"country\"]],false],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"]],\"locals\":[\"address\"]},null],[0,\"    \\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[0,\"\\n\"],[18,\"default\"],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[\"default\"],\"hasPartials\":false}", "meta": { "moduleName": "emp-app/templates/components/user-listing.hbs" } });
 });
 define("emp-app/templates/contact", ["exports"], function (exports) {
   "use strict";
@@ -615,11 +604,206 @@ define("emp-app/templates/users", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "X5Be9coF", "block": "{\"statements\":[[11,\"div\",[]],[15,\"class\",\"jumbo\"],[13],[0,\"\\n\"],[0,\"  \"],[11,\"button\",[]],[15,\"class\",\"right button\"],[5,[\"action\"],[[28,[null]],\"toggleModal\",[28,[null]]]],[13],[0,\"Add User\"],[14],[0,\"\\n  \"],[11,\"h3\",[]],[13],[0,\"Welcome!\"],[14],[0,\"\\n  \"],[11,\"p\",[]],[13],[0,\"We hope you find exactly what you're looking for in a place to stay.\"],[14],[0,\"\\n  \\n\"],[14],[0,\"\\n\"],[11,\"div\",[]],[15,\"class\",\"employee-layout\"],[13],[0,\"\\n\"],[6,[\"each\"],[[28,[\"model\",\"content\"]]],null,{\"statements\":[[0,\"    \"],[1,[33,[\"user-listing\"],null,[[\"user\"],[[28,[\"item\",\"_data\"]]]]],false],[0,\"\\n\"]],\"locals\":[\"item\"]},null],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"isShowingModal\"]]],null,{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"targetAttachment\",\"translucentOverlay\"],[[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"isShowingModal\"]]],null],false],null],\"center\",true]],{\"statements\":[[0,\"          \"],[11,\"div\",[]],[15,\"class\",\"listing\"],[13],[0,\"\\n              \"],[11,\"h3\",[]],[13],[0,\"Create new profile\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Name:\"],[14],[0,\" \"],[1,[28,[\"employee\",\"name\"]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Age:\"],[14],[0,\" \"],[1,[28,[\"employee\",\"age\"]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"status:\"],[14],[0,\" \"],[1,[28,[\"employee\",\"status\"]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Location:\"],[14],[0,\" \"],[1,[28,[\"employee\",\"city\"]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Email:\"],[14],[0,\" \"],[1,[28,[\"employee\",\"email\"]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"button\",[]],[15,\"class\",\"button\"],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"isShowingModal\"]]],null],false],null],null],[13],[0,\"Close\"],[14],[0,\"\\n\"],[0,\"          \"],[14],[0,\"   \\n             \\n\"]],\"locals\":[]},null]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "emp-app/templates/users.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "VCc8Wt+t", "block": "{\"statements\":[[11,\"div\",[]],[15,\"class\",\"jumbo\"],[13],[0,\"\\n\"],[0,\"  \"],[11,\"button\",[]],[15,\"class\",\"right button\"],[5,[\"action\"],[[28,[null]],\"toggleModal\",[28,[null]]]],[13],[0,\"Add User\"],[14],[0,\"\\n  \"],[11,\"h3\",[]],[13],[0,\"Welcome!\"],[14],[0,\"\\n  \"],[11,\"p\",[]],[13],[0,\"We hope you find exactly what you're looking for in a place to stay.\"],[14],[0,\"  \\n\"],[14],[0,\"\\n\\n\"],[11,\"div\",[]],[15,\"class\",\"\"],[13],[0,\"\\n    \"],[11,\"article\",[]],[15,\"class\",\"listing list-header m-w-800\"],[13],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail avatar\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Avtar\"],[14],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Name\"],[14],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"status\"],[14],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail avatar\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Age\"],[14],[0,\"\\n        \"],[14],[0,\"  \\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Location\"],[14],[0,\"\\n        \"],[14],[0,\"\\n        \"],[11,\"div\",[]],[15,\"class\",\"detail\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[13],[0,\"Email\"],[14],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"],[1,[33,[\"log\"],[\"model\",[28,[\"model\"]]],null],false],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"employee-layout m-w-800\"],[13],[0,\"\\n\"],[6,[\"each\"],[[28,[\"model\"]]],null,{\"statements\":[[0,\"            \"],[1,[33,[\"user-listing\"],null,[[\"user\"],[[28,[\"item\"]]]]],false],[0,\"\\n\"]],\"locals\":[\"item\"]},null],[0,\"    \"],[14],[0,\"\\n\"],[14],[0,\"\\n\"],[6,[\"if\"],[[28,[\"isShowingModal\"]]],null,{\"statements\":[[0,\"  \"],[11,\"div\",[]],[15,\"class\",\"create-user\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"create-layout\"],[13],[0,\"\\n              \"],[11,\"h3\",[]],[13],[0,\"Create new profile\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Name:\"],[14],[0,\" \\n                  \"],[1,[33,[\"input\"],null,[[\"class\",\"type\",\"value\",\"placeholder\",\"maxlength\"],[\"ao-input\",\"text\",[28,[\"model\",\"user\",\"name\"]],\"Name\",\"101\"]]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Age:\"],[14],[0,\" \\n                  \"],[1,[33,[\"input\"],null,[[\"class\",\"type\",\"value\",\"placeholder\",\"maxlength\"],[\"ao-input\",\"text\",[28,[\"model\",\"user\",\"age\"]],\"Age\",\"101\"]]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Status:\"],[14],[0,\" \\n                  \"],[1,[33,[\"input\"],null,[[\"class\",\"type\",\"value\",\"placeholder\",\"maxlength\"],[\"ao-input\",\"text\",[28,[\"model\",\"user\",\"status\"]],\"Status\",\"101\"]]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Location:\"],[14],[0,\" \\n                  \"],[1,[33,[\"input\"],null,[[\"class\",\"type\",\"value\",\"placeholder\",\"maxlength\"],[\"ao-input\",\"text\",[28,[\"model\",\"user\",\"location\"]],\"Location\",\"101\"]]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"\"],[13],[0,\"\\n                  \"],[11,\"span\",[]],[13],[0,\"Email:\"],[14],[0,\" \\n                  \"],[1,[33,[\"input\"],null,[[\"class\",\"type\",\"value\",\"placeholder\",\"maxlength\"],[\"ao-input\",\"text\",[28,[\"model\",\"user\",\"email\"]],\"Email\",\"101\"]]],false],[0,\"\\n              \"],[14],[0,\"\\n              \"],[11,\"br\",[]],[13],[14],[11,\"br\",[]],[13],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"close-btn\"],[13],[0,\"\\n                \"],[11,\"button\",[]],[15,\"class\",\"button\"],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"isShowingModal\"]]],null],false],null],null],[13],[0,\"Close\"],[14],[0,\"\\n                \"],[11,\"button\",[]],[15,\"class\",\"button\"],[16,\"onclick\",[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"isShowingModal\"]]],null],false],null],null],[13],[0,\"Save\"],[14],[0,\"    \\n              \"],[14],[0,\"\\n              \\n          \"],[14],[0,\"   \\n      \\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "emp-app/templates/users.hbs" } });
+});
+define('emp-app/validators/alias', ['exports', 'ember-cp-validations/validators/alias'], function (exports, _alias) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _alias.default;
+    }
+  });
+});
+define('emp-app/validators/belongs-to', ['exports', 'ember-cp-validations/validators/belongs-to'], function (exports, _belongsTo) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _belongsTo.default;
+    }
+  });
+});
+define('emp-app/validators/collection', ['exports', 'ember-cp-validations/validators/collection'], function (exports, _collection) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _collection.default;
+    }
+  });
+});
+define('emp-app/validators/confirmation', ['exports', 'ember-cp-validations/validators/confirmation'], function (exports, _confirmation) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _confirmation.default;
+    }
+  });
+});
+define('emp-app/validators/date', ['exports', 'ember-cp-validations/validators/date'], function (exports, _date) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _date.default;
+    }
+  });
+});
+define('emp-app/validators/dependent', ['exports', 'ember-cp-validations/validators/dependent'], function (exports, _dependent) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _dependent.default;
+    }
+  });
+});
+define('emp-app/validators/ds-error', ['exports', 'ember-cp-validations/validators/ds-error'], function (exports, _dsError) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _dsError.default;
+    }
+  });
+});
+define('emp-app/validators/exclusion', ['exports', 'ember-cp-validations/validators/exclusion'], function (exports, _exclusion) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _exclusion.default;
+    }
+  });
+});
+define('emp-app/validators/format', ['exports', 'ember-cp-validations/validators/format'], function (exports, _format) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _format.default;
+    }
+  });
+});
+define('emp-app/validators/has-many', ['exports', 'ember-cp-validations/validators/has-many'], function (exports, _hasMany) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _hasMany.default;
+    }
+  });
+});
+define('emp-app/validators/inclusion', ['exports', 'ember-cp-validations/validators/inclusion'], function (exports, _inclusion) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _inclusion.default;
+    }
+  });
+});
+define('emp-app/validators/length', ['exports', 'ember-cp-validations/validators/length'], function (exports, _length) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _length.default;
+    }
+  });
+});
+define('emp-app/validators/messages', ['exports', 'ember-cp-validations/validators/messages'], function (exports, _messages) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _messages.default;
+    }
+  });
+});
+define('emp-app/validators/number', ['exports', 'ember-cp-validations/validators/number'], function (exports, _number) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _number.default;
+    }
+  });
+});
+define('emp-app/validators/presence', ['exports', 'ember-cp-validations/validators/presence'], function (exports, _presence) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _presence.default;
+    }
+  });
 });
 
 
-define('emp-app/config/environment', ['ember'], function(Ember) {
+define('emp-app/config/environment', [], function() {
   var prefix = 'emp-app';
 try {
   var metaName = prefix + '/config/environment';

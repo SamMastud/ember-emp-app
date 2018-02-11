@@ -2,40 +2,68 @@
   {{!-- <div class="right niyuj-logo"></div> --}}
   <button class="right button" {{action "toggleModal" this}}>Add User</button>
   <h3>Welcome!</h3>
-  <p>We hope you find exactly what you're looking for in a place to stay.</p>
-  
-</div>
-<div class="employee-layout">
-  {{#each model.content as |item|}}
-    {{user-listing user=item._data}}
-  {{/each}}
+  <p>We hope you find exactly what you're looking for in a place to stay.</p>  
 </div>
 
+<div class="">
+    <article class="listing list-header m-w-800">
+        <div class="detail avatar">
+            <span>Avtar</span>
+        </div>
+        <div class="detail">
+            <span>Name</span>
+        </div>
+        <div class="detail">
+            <span>status</span>
+        </div>
+        <div class="detail avatar">
+            <span>Age</span>
+        </div>  
+        <div class="detail">
+            <span>Location</span>
+        </div>
+        <div class="detail">
+            <span>Email</span>
+        </div>
+    </article>
+{{log "model" model}}
+    <div class="employee-layout m-w-800">
+        {{#each model as |item|}} 
+            {{user-listing user=item}}
+        {{/each}}
+    </div>
+</div>
 {{#if isShowingModal}}
-  {{#modal-dialog onClose=(action (mut isShowingModal) false)
-    targetAttachment="center"
-    translucentOverlay=true 
-  }}
-          <div class="listing">
+  <div class="create-user">
+    <div class="create-layout">
               <h3>Create new profile</h3>
-              <div class="detail">
-                  <span>Name:</span> {{employee.name}}
+              <div class="">
+                  <span>Name:</span> 
+                  {{input class="ao-input" type="text" value=model.user.name placeholder="Name"  maxlength="101"}}
               </div>
-              <div class="detail">
-                  <span>Age:</span> {{employee.age}}
+              <div class="">
+                  <span>Age:</span> 
+                  {{input class="ao-input" type="text" value=model.user.age placeholder="Age"  maxlength="101"}}
               </div>
-              <div class="detail">
-                  <span>status:</span> {{employee.status}}
+              <div class="">
+                  <span>Status:</span> 
+                  {{input class="ao-input" type="text" value=model.user.status placeholder="Status"  maxlength="101"}}
               </div>
-              <div class="detail">
-                  <span>Location:</span> {{employee.city}}
+              <div class="">
+                  <span>Location:</span> 
+                  {{input class="ao-input" type="text" value=model.user.location placeholder="Location"  maxlength="101"}}
               </div>
-              <div class="detail">
-                  <span>Email:</span> {{employee.email}}
+              <div class="">
+                  <span>Email:</span> 
+                  {{input class="ao-input" type="text" value=model.user.email placeholder="Email"  maxlength="101"}}
               </div>
-              <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
-              {{!-- <button class="button" onclick={{action "saveUser" employee}}>Save</button> --}}
+              <br><br>
+              <div class="close-btn">
+                <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
+                <button class="button" onclick={{action (mut isShowingModal) false}}>Save</button>    
+              </div>
+              
           </div>   
-             
-  {{/modal-dialog}}
+      
+  </div>
 {{/if}}

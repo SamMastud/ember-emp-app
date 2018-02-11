@@ -1,28 +1,32 @@
-<article class="listing">
-    <img src="{{user.image}}" alt="">    
-  <h4>{{user.name}}</h4>
-  <div class="detail">
-    <span>Age:</span> {{user.age}}
-  </div>
-  <div class="detail">
-    <span>status:</span> {{user.status}}
-  </div>
-  <div class="detail">
-    <span>Location:</span> {{user.city}}
-  </div>
-  <div class="detail">
-    <span>Email:</span> {{user.email}}
-  </div>
-  <div class="detail">
-    <button class="button details-position" {{action "toggleModal"}}>See Details</button>
-  </div>
-</article>
 
+
+<div {{action 'toggleModal'}}>
+    <article class="listing">
+    <div class="detail avatar">
+        <img src="{{user.image}}" alt="">
+    </div>
+    <div class="detail">
+        <span>{{user.name}}</span>
+    </div>
+    <div class="detail">
+        <span>{{user.status}}</span>
+    </div>
+    <div class="detail avatar">
+        <span>{{user.age}}</span>
+    </div>
+    <div class="detail">
+        <span>{{user.city}}</span>
+    </div>
+    <div class="detail">
+        <span>{{user.email}}</span>
+    </div>
+    </article>
+</div>
 
 {{#if isShowingModal}}
   {{#modal-dialog onClose="toggleModal"
     targetAttachment="center"
-    translucentOverlay=true}}
+    containerClass='details'}}
     <div class="listing">
         <h3>Profile</h3>
         <div class="detail">

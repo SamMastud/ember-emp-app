@@ -72,7 +72,52 @@
   margin: 1rem; }
 
 .employee-layout {
-  max-height: 470px;
+  max-height: 410px;
   overflow-y: auto; }
+
+.w-p-100 {
+  width: 100%; }
+
+.m-w-800 {
+  max-width: 800px; }
+
+.m-w-200 {
+  max-width: 200px; }
+
+.details {
+  top: 208px !important;
+  right: 18px !important;
+  left: auto !important;
+  transform: unset !important;
+  width: 455px;
+  height: 66%;
+  vertical-align: middle; }
+
+.create-user {
+  top: 192px;
+  right: 15px;
+  width: 465px;
+  height: 66%;
+  position: absolute; }
+
+.create-layout {
+  margin-top: 15px;
+  background-color: #e7e4e4;
+  padding: 10px 20px;
+  min-height: 40px;
+  height: 450px;
+  box-shadow: 0 0 10px #222; }
+
+.avatar {
+  width: 10% !important; }
+
+.list-header:hover {
+  background-color: #e7e4e4;
+  cursor: unset; }
+
+.close-btn {
+  position: absolute;
+  bottom: 0px;
+  right: 15px; }
 
 /*# sourceMappingURL=emp-app.css.map */
