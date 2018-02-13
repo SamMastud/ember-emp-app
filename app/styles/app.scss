@@ -65,6 +65,9 @@
     min-height: 40px;
     height: 450px;
     box-shadow: 0 0 10px #222;
+    max-height: 450px;
+    overflow-y: auto;
+    background-color: white
 }
 .avatar{
     width: 10% !important;
@@ -77,4 +80,31 @@
     position: absolute;
     bottom: 0px;
     right: 15px;
+}
+.input-lable {
+    width: 30%;
+    display: inline-block;
+    padding: 0 10px;
+    margin: 0;
+    font-weight: 300;
+    font-style: italic;
+    vertical-align: middle;
+}
+.emp-input{
+    width: 65%;
+    display: inline-block;
+    padding: 0 10px;
+    margin: 0;
+    font-weight: 300;
+    font-style: italic;
+    vertical-align: middle;
+}
+.emp-input{
+    input {
+        height: 25px;
+        padding: 0px 4px
+    }
+}
+.h-33{
+    height: 33px;
 }

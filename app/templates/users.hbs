@@ -1,8 +1,8 @@
 <div class="jumbo">
   {{!-- <div class="right niyuj-logo"></div> --}}
-  <button class="right button" {{action "toggleModal" this}}>Add User</button>
+  <button class="right button" {{action "toggleModal" this model}}>Add User</button>
   <h3>Welcome!</h3>
-  <p>We hope you find exactly what you're looking for in a place to stay.</p>  
+  <p>We hope you find exactly what you're looking for in a place to stay.</p>
 </div>
 
 <div class="">
@@ -14,7 +14,7 @@
             <span>Name</span>
         </div>
         <div class="detail">
-            <span>status</span>
+            <span>Status</span>
         </div>
         <div class="detail avatar">
             <span>Age</span>
@@ -26,44 +26,94 @@
             <span>Email</span>
         </div>
     </article>
-{{log "model" model}}
     <div class="employee-layout m-w-800">
-        {{#each model as |item|}} 
-            {{user-listing user=item}}
+        {{#each model.users as |item|}}
+            {{#if item.id}}
+                {{user-listing user=item}}
+            {{/if}}
         {{/each}}
     </div>
 </div>
 {{#if isShowingModal}}
   <div class="create-user">
     <div class="create-layout">
-              <h3>Create new profile</h3>
-              <div class="">
-                  <span>Name:</span> 
-                  {{input class="ao-input" type="text" value=model.user.name placeholder="Name"  maxlength="101"}}
+              <h3>Create new profile</h3> {{log model.user}}
+              <div class="h-33">
+                  <div class="input-lable">Name:</div>
+                  <div class="emp-input">{{input class="ao-input" type="text" value=model.user.name placeholder="Name" size="30" maxlength="101"}}</div>
               </div>
-              <div class="">
-                  <span>Age:</span> 
-                  {{input class="ao-input" type="text" value=model.user.age placeholder="Age"  maxlength="101"}}
+              <div class="h-33">
+                    <div class="input-lable">Age:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.age placeholder="Age" size="30" maxlength="101"}}
+                    </div>
               </div>
-              <div class="">
-                  <span>Status:</span> 
-                  {{input class="ao-input" type="text" value=model.user.status placeholder="Status"  maxlength="101"}}
+              <div class="h-33">
+                    <div class="input-lable">Marital Status:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.status placeholder="Status" size="30" maxlength="101"}}
+                    </div>
               </div>
-              <div class="">
-                  <span>Location:</span> 
-                  {{input class="ao-input" type="text" value=model.user.location placeholder="Location"  maxlength="101"}}
+              <div class="h-33">
+                    <div class="input-lable">Location:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.city placeholder="Location" size="30" maxlength="101"}}
+                    </div>
               </div>
-              <div class="">
-                  <span>Email:</span> 
-                  {{input class="ao-input" type="text" value=model.user.email placeholder="Email"  maxlength="101"}}
+              <div class="h-33">
+                    <div class="input-lable">Email:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.email placeholder="Email" size="30" maxlength="101"}}
+                    </div>
+              </div>
+              <div class="h-33">
+                    <div class="input-lable">Street:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.street placeholder="Street" size="30" maxlength="101"}}
+                    </div>
+              </div>
+              <div class="h-33">
+                    <div class="input-lable">Pin Code:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
+                    </div>
+              </div>
+              <div class="h-33">
+                    <div class="input-lable">City:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.city placeholder="City" size="30" maxlength="101"}}
+                    </div>
+              </div>
+              <div class="h-33">
+                    <div class="input-lable">Country:</div>
+                    <div class="emp-input">
+                        {{input type="text" value=model.user.country placeholder="Country" size="30" maxlength="101"}}
+                    </div>
               </div>
               <br><br>
               <div class="close-btn">
                 <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
-                <button class="button" onclick={{action (mut isShowingModal) false}}>Save</button>    
+                <button class="button" onclick={{action  (route-action 'saveUser' this model.user)}}>Save</button>
               </div>
-              
-          </div>   
-      
+          </div>
   </div>
 {{/if}}
+
+
+{{#each user.address as |address|}}
+   <div class="listing">
+       <h3>{{address.type}}</h3>
+         <div class="detail">
+            <span>Street:</span> {{address.street}}
+        </div>
+        <div class="detail">
+            <span>Zip Code:</span> {{address.pin-code}}
+        </div>
+        <div class="detail">
+            <span>City:</span> {{address.city}}
+        </div>
+        <div class="detail">
+            <span>Country:</span> {{address.country}}
+        </div>
+    </div>
+{{/each}}
