@@ -24,46 +24,58 @@
 </div>
 
 {{#if isShowingModal}}
-  {{#modal-dialog onClose="toggleModal"
-    targetAttachment="center"
-    containerClass='details'}}
-    <div class="listing">
-        <h3>Profile</h3>
-        <div class="detail">
-            <span>Name:</span> {{user.name}}
-        </div>
-        <div class="detail">
-            <span>Age:</span> {{user.age}}
-        </div>
-        <div class="detail">
-            <span>Status:</span> {{user.status}}
-        </div>
-        <div class="detail">
-            <span>Location:</span> {{user.city}}
-        </div>
-        <div class="detail">
-            <span>Email:</span> {{user.email}}
+
+<div class="create-user">
+    <div class="create-layout">
+        <div class="text-center">
+            <h4>Profile</h4>
+            </div>
+            <div class="input-lable">Name:</div>
+            <div class="emp-input">
+                {{input class="ao-input" type="text" value=user.name placeholder="Name" size="30" maxlength="101"}}
+            </div>
+            <div class="input-lable">Age:</div>
+            <div class="emp-input">
+                {{input type="text" value=user.age placeholder="Age" size="30" maxlength="101"}}
+            </div>
+            <div class="input-lable">Marital Status:</div>
+            <div class="emp-input">
+                {{input type="text" value=user.status placeholder="Status" size="30" maxlength="101"}}
+            </div>
+            <div class="input-lable">Location:</div>
+            <div class="emp-input">
+                {{input type="text" value=user.city placeholder="Location" size="30" maxlength="101"}}
+            </div>
+            <div class="input-lable">Email:</div>
+            <div class="emp-input">
+                {{input type="text" value=user.email placeholder="Email" size="30" maxlength="101"}}
+            </div>
+            {{#each user.address as |address|}}
+                <h4>{{address.type}}</h4>
+                <div class="input-lable">Street:</div>
+                <div class="emp-input">
+                    {{input type="text" value=address.street placeholder="Street" size="30" maxlength="101"}}
+                </div>
+                <div class="input-lable">Pin Code:</div>
+                <div class="emp-input">
+                    {{input type="text" value=address.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
+                </div>
+                <div class="input-lable">Country:</div>
+                <div class="emp-input">
+                    {{input type="text" value=address.country placeholder="Country" size="30" maxlength="101"}}
+                </div>
+            {{/each}}
+        <div class="p-t-10 text-center">
+        <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
+        <button class="button" onclick={{action  (route-action 'editUser' this user)}}>Save</button>
         </div>
     </div>
-{{#each user.address as |address|}}
-   <div class="listing">
-       <h3>{{address.type}}</h3>
-         <div class="detail">
-            <span>Street:</span> {{address.street}}
-        </div>
-        <div class="detail">
-            <span>Zip Code:</span> {{address.pin-code}}
-        </div>
-        <div class="detail">
-            <span>City:</span> {{address.city}}
-        </div>
-        <div class="detail">
-            <span>Country:</span> {{address.country}}
-        </div>
-    </div>
-{{/each}}
-    
-  {{/modal-dialog}}
+  </div>
+
+
 {{/if}}
+
+
+
 
 {{yield}}

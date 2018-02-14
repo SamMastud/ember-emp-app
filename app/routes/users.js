@@ -5,18 +5,22 @@ export default Route.extend({
     model() {
 		return hash({
             users: this.store.findAll('user'),
-            user: null
+            user: this.store.createRecord('user')
 		});
 	},
     actions: {
-        toggleModal(self, model) {
-            let newuser = this.store.createRecord('user')
-			model.user = newuser;
-            self.toggleProperty('isShowingModal');
+        toggleModal(self) {
+            self.set('isShowingModal',true);
         },
         saveUser(self, user) {
             user.save()
-            self.toggleProperty('isShowingModal');
+            self.set('isShowingModal',false);
+            alert('User Created Successful!');
+        },
+        editUser(self, user) {
+            user.save()
+            self.set('isShowingModal',false);
+            alert('User details updated Successful!')
         }
     }
 });

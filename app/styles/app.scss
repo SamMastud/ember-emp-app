@@ -76,10 +76,8 @@
    background-color: #e7e4e4;
    cursor: unset;
 }
-.close-btn {
-    position: absolute;
-    bottom: 0px;
-    right: 15px;
+.p-t-10 {
+   padding-top: 10px;
 }
 .input-lable {
     width: 30%;
@@ -107,4 +105,7 @@
 }
 .h-33{
     height: 33px;
+}
+.text-center {
+    text-align: center;
 }
