@@ -1,5 +1,3 @@
-
-
 <div {{action 'toggleModal'}}>
     <article class="listing">
     <div class="detail avatar">
@@ -22,14 +20,15 @@
     </div>
     </article>
 </div>
+{{log user.id currentUserId}}
+{{#if (eq user.id currentUserId)}}
+    {{log "user" user.id}}
+{{/if}}
 
 {{#if isShowingModal}}
-
 <div class="create-user">
-    <div class="create-layout">
-        <div class="text-center">
+    <div class="text-center create-layout">
             <h4>Profile</h4>
-            </div>
             <div class="input-lable">Name:</div>
             <div class="emp-input">
                 {{input class="ao-input" type="text" value=user.name placeholder="Name" size="30" maxlength="101"}}
@@ -51,7 +50,7 @@
                 {{input type="text" value=user.email placeholder="Email" size="30" maxlength="101"}}
             </div>
             {{#each user.address as |address|}}
-                <h4>{{address.type}}</h4>
+                <h4 class="p-t-15">{{address.type}}</h4>
                 <div class="input-lable">Street:</div>
                 <div class="emp-input">
                     {{input type="text" value=address.street placeholder="Street" size="30" maxlength="101"}}
@@ -65,17 +64,44 @@
                     {{input type="text" value=address.country placeholder="Country" size="30" maxlength="101"}}
                 </div>
             {{/each}}
-        <div class="p-t-10 text-center">
-        <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
-        <button class="button" onclick={{action  (route-action 'editUser' this user)}}>Save</button>
+        <div class="p-t-15">
+        <button class="button" onclick={{action (mut showSaveConfirm) true}}>Save</button>
+        <button class="button" onclick={{action (mut showRemoveConfirm) true}}>Remove</button>
         </div>
     </div>
   </div>
-
-
 {{/if}}
 
+{{#if showRemoveConfirm}}
+  {{#modal-dialog onClose="toggleModal"
+        targetAttachment="center"
+        translucentOverlay=true}}
+            <div class="confirm-layout">
+               <h3 class="p-t-15">
+                    Are you sure you want to remove {{user.name}}?
+               </h3>
+                <div class="p-t-15">
+                    <button class="button" onclick={{action  (route-action 'removeUser' this user)}}>Yes, Remove</button>
+                    <button class="button" onclick={{action (mut showRemoveConfirm) false}}>Cancel</button>
+                </div>
+            </div>
+  {{/modal-dialog}}
+{{/if}}
 
-
+{{#if showSaveConfirm}}
+  {{#modal-dialog onClose="toggleModal"
+        targetAttachment="center"
+        translucentOverlay=true}}
+            <div class="confirm-layout">
+               <h3 class="p-t-15">
+                    Are you sure you want update information of {{user.name}}?
+               </h3>
+                <div class="p-t-15">
+                    <button class="button" onclick={{action  (route-action 'editUser' this user)}}>Yes, Update</button>
+                    <button class="button" onclick={{action (mut showSaveConfirm) false}}>Cancel</button>
+                </div>
+            </div>
+  {{/modal-dialog}}
+{{/if}}
 
 {{yield}}

@@ -36,10 +36,8 @@
 </div>
 {{#if isShowingModal}}
   <div class="create-user">
-    <div class="create-layout">
-        <div class="text-center">
+    <div class="text-center create-layout">
             <h4>Create new profile</h4>
-            </div>
             <div class="input-lable">Name:</div>
             <div class="emp-input">{{input class="ao-input" type="text" value=model.user.name placeholder="Name" size="30" maxlength="101"}}</div>
             <div class="input-lable">Age:</div>
@@ -58,7 +56,7 @@
             <div class="emp-input">
                 {{input type="text" value=model.user.email placeholder="Email" size="30" maxlength="101"}}
             </div>
-            <h4>Current Address</h4>
+            <h4 class="p-t-15">Current Address</h4>
             <div class="input-lable">Street:</div>
             <div class="emp-input">
                 {{input type="text" value=model.user.street placeholder="Street" size="30" maxlength="101"}}
@@ -71,7 +69,7 @@
             <div class="emp-input">
                 {{input type="text" value=model.user.country placeholder="Country" size="30" maxlength="101"}}
             </div>
-            <h4>Permanant Address</h4>
+            <h4 class="p-t-15">Permanant Address</h4>
             <div class="input-lable">Street:</div>
             <div class="emp-input">
                 {{input type="text" value=model.user.street placeholder="Street" size="30" maxlength="101"}}
@@ -84,7 +82,7 @@
             <div class="emp-input">
                 {{input type="text" value=model.user.country placeholder="Country" size="30" maxlength="101"}}
             </div>
-        <div class="p-t-10 text-center">
+        <div class="p-t-15">
         <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
         <button class="button" onclick={{action  (route-action 'saveUser' this model.user)}}>Save</button>
         </div>

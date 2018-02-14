@@ -13,14 +13,21 @@ export default Route.extend({
             self.set('isShowingModal',true);
         },
         saveUser(self, user) {
-            user.save()
+            user.save();
             self.set('isShowingModal',false);
             alert('User Created Successful!');
         },
         editUser(self, user) {
-            user.save()
+            self.set('showSaveConfirm', false);
+            user.save();
             self.set('isShowingModal',false);
             alert('User details updated Successful!')
+        },
+        removeUser(self, user){
+            self.set('showRemoveConfirm', false);
+            user.destroyRecord();
+            self.set('isShowingModal',false);
+            alert('User Removed Successful!')
         }
     }
 });

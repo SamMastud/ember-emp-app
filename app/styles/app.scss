@@ -52,22 +52,21 @@
     
 }
 .create-user {
-    top: 192px;
+    top: 175px;
     right: 15px;
     width: 465px;
-    height: 66%;
+    height: 74%;
     position: absolute;
 }
 .create-layout{
     margin-top: 15px;    
-    background-color: #e7e4e4;
     padding: 10px 20px;
     min-height: 40px;
-    height: 450px;
+    height: 480px;
     box-shadow: 0 0 10px #222;
-    max-height: 450px;
+    max-height: 480px;
     overflow-y: auto;
-    background-color: white
+    background-color: #F9F9F9
 }
 .avatar{
     width: 10% !important;
@@ -76,8 +75,8 @@
    background-color: #e7e4e4;
    cursor: unset;
 }
-.p-t-10 {
-   padding-top: 10px;
+.p-t-15 {
+   padding-top: 15px;
 }
 .input-lable {
     width: 30%;
@@ -108,4 +107,12 @@
 }
 .text-center {
     text-align: center;
+}
+.confirm-layout{
+    padding: 10px;
+    background-color: #e7e4e4;
+    margin: 11px;
+    text-align: center;
+    width: 550px;
+    height: 150px;
 }
