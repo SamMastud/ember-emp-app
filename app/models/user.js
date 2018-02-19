@@ -1,9 +1,11 @@
 import DS from 'ember-data';
 import { validator, buildValidations } from 'ember-cp-validations';
 
-
 const Validations = buildValidations({
-    username: validator('presence', true),
+  name: validator('presence', true),
+  age: validator('presence', true),
+  city: validator('presence', true),
+  status: validator('presence', true),
     email: [
       validator('presence', true),
       validator('format', { type: 'email' })

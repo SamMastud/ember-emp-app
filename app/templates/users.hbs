@@ -1,8 +1,7 @@
 <div class="jumbo">
   {{!-- <div class="right niyuj-logo"></div> --}}
   <button class="right button" {{action "toggleModal" this}}>Add User</button>
-  <h3>Welcome!</h3>
-  <p>We hope you find exactly what you're looking for in a place to stay.</p>
+  <h3>Welcome! <h5>We hope you find exactly what you're looking for in a place to stay.</h5></h3>
 </div>
 
 <div class="">
@@ -36,55 +35,71 @@
 </div>
 {{#if isShowingModal}}
   <div class="create-user">
-    <div class="text-center create-layout">
-            <h4>Create new profile</h4>
-            <div class="input-lable">Name:</div>
-            <div class="emp-input">{{input class="ao-input" type="text" value=model.user.name placeholder="Name" size="30" maxlength="101"}}</div>
-            <div class="input-lable">Age:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.age placeholder="Age" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Marital Status:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.status placeholder="Status" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Location:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.city placeholder="Location" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Email:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.email placeholder="Email" size="30" maxlength="101"}}
-            </div>
-            <h4 class="p-t-15">Current Address</h4>
+    <div class="create-layout">
+        <h4 class="text-center">Create new profile</h4>
+        <div class="input-lable">Name<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input class="ao-input" type="text" value=model.user.name placeholder="Name" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                 <span class="validation">
+                    {{v-get model.user 'name' 'message'}}
+                 </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Age<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.age placeholder="Age" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'age' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Marital Status<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.status placeholder="Status" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'status' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Location<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.city placeholder="Location" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'city' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Email<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.email placeholder="Email" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'email' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        {{#each model.user.address as |address|}}
+            <h4 class="p-t-15 text-center">{{address.type}}</h4>
             <div class="input-lable">Street:</div>
             <div class="emp-input">
-                {{input type="text" value=model.user.street placeholder="Street" size="30" maxlength="101"}}
+                {{input type="text" value=address.street placeholder="Street" size="30" maxlength="101"}}
             </div>
             <div class="input-lable">Pin Code:</div>
             <div class="emp-input">
-                {{input type="text" value=model.user.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
+                {{input type="text" value=address.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
             </div>
             <div class="input-lable">Country:</div>
             <div class="emp-input">
-                {{input type="text" value=model.user.country placeholder="Country" size="30" maxlength="101"}}
+                {{input type="text" value=address.country placeholder="Country" size="30" maxlength="101"}}
             </div>
-            <h4 class="p-t-15">Permanant Address</h4>
-            <div class="input-lable">Street:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.street placeholder="Street" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Pin Code:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Country:</div>
-            <div class="emp-input">
-                {{input type="text" value=model.user.country placeholder="Country" size="30" maxlength="101"}}
-            </div>
-        <div class="p-t-15">
-        <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
-        <button class="button" onclick={{action  (route-action 'saveUser' this model.user)}}>Save</button>
+        {{/each}}
+        <div class="p-t-15 text-center">
+            <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
+            <button class="button" onclick={{action  (route-action 'saveUser' this model.user)}}>Save</button>
         </div>
     </div>
   </div>

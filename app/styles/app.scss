@@ -29,7 +29,7 @@
     margin: 1rem;
 }
 .employee-layout {
-    max-height: 410px;
+    max-height: 435px;
     overflow-y: auto;
 }
 .w-p-100 {
@@ -52,19 +52,18 @@
     
 }
 .create-user {
-    top: 175px;
+    top: 165px;
     right: 15px;
     width: 465px;
     height: 74%;
     position: absolute;
 }
 .create-layout{
-    margin-top: 15px;    
     padding: 10px 20px;
     min-height: 40px;
-    height: 480px;
+    height: 485px;
     box-shadow: 0 0 10px #222;
-    max-height: 480px;
+    max-height: 485px;
     overflow-y: auto;
     background-color: #F9F9F9
 }
@@ -115,4 +114,9 @@
     text-align: center;
     width: 550px;
     height: 150px;
+}
+.validation {
+    font-size: 12px;
+    color: red;
+    font-weight: 600;
 }
