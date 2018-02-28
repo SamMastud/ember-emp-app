@@ -1,0 +1,114 @@
+ <div class="create-user">
+    <div class="create-layout">
+        <h4 class="text-center">
+            {{#if (eq source 'create')}}
+                Create new profile
+            {{else}}
+                Profile
+            {{/if}}
+        </h4>
+        <div class="input-lable">Name<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input class="ao-input" type="text" value=model.user.name placeholder="Name" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                 <span class="validation">
+                    {{v-get model.user 'name' 'message'}}
+                 </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Age<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.age placeholder="Age" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'age' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Marital Status<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.status placeholder="Status" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'status' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Location<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.city placeholder="Location" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'city' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        <div class="input-lable">Email<span class="validation">*</span></div>
+        <div class="emp-input">
+            {{input type="text" value=model.user.email placeholder="Email" size="30" maxlength="101"}}
+            {{#if showValidationErrors}}
+                <span class="validation">
+                    {{v-get model.user 'email' 'message'}}
+                </span>
+            {{/if}}
+        </div>
+        {{#each model.user.address as |address|}}
+            <h4 class="p-t-15 text-center">{{address.type}}</h4>
+            <div class="input-lable">Street:</div>
+            <div class="emp-input">
+                {{input type="text" value=address.street placeholder="Street" size="30" maxlength="101"}}
+            </div>
+            <div class="input-lable">Pin Code:</div>
+            <div class="emp-input">
+                {{input type="text" value=address.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
+            </div>
+            <div class="input-lable">Country:</div>
+            <div class="emp-input">
+                {{input type="text" value=address.country placeholder="Country" size="30" maxlength="101"}}
+            </div>
+        {{/each}}
+        <div class="p-t-15 text-center">
+            {{#if (eq source 'create')}}
+                <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
+                <button class="button" onclick={{action  (route-action 'saveUser' this model.user)}}>Save</button>
+            {{else}}
+                <button class="button" onclick={{action 'validateAndSaveConfirm' model.user}}>Save</button>
+                <button class="button" onclick={{action (mut showRemoveConfirm) true}}>Remove</button>
+            {{/if}}
+        </div>
+    </div>
+  </div>
+
+{{#if showRemoveConfirm}}
+  {{#modal-dialog onClose="toggleModal"
+        targetAttachment="center"
+        translucentOverlay=true}}
+            <div class="confirm-layout">
+               <h3 class="p-t-15">
+                    Are you sure you want to remove {{user.name}}?
+               </h3>
+                <div class="p-t-15">
+                    <button class="button" onclick={{action  (route-action 'removeUser' this model.user)}}>Yes, Remove</button>
+                    <button class="button" onclick={{action (mut showRemoveConfirm) false}}>Cancel</button>
+                </div>
+            </div>
+  {{/modal-dialog}}
+{{/if}}
+
+{{#if showSaveConfirm}}
+  {{#modal-dialog onClose="toggleModal"
+        targetAttachment="center"
+        translucentOverlay=true}}
+            <div class="confirm-layout">
+               <h3 class="p-t-15">
+                    Are you sure you want update information of {{user.name}}?
+               </h3>
+                <div class="p-t-15">
+                    <button class="button" onclick={{action  (route-action 'editUser' this model.user)}}>Yes, Update</button>
+                    <button class="button" onclick={{action (mut showSaveConfirm) false}}>Cancel</button>
+                </div>
+            </div>
+  {{/modal-dialog}}
+{{/if}}
+
+{{yield}}

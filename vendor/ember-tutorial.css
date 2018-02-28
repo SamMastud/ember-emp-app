@@ -211,6 +211,7 @@ p {
     min-height: 40px;
     position: relative;
     cursor: pointer;
+    color: black;
 }
 
 .listing:hover {

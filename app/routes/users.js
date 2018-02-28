@@ -29,7 +29,7 @@ export default Route.extend({
                 if(validations.get('isValid')) {
                     self.set('isShowingModal',false);
                     alert('User Created Successful!');
-                    return  user.save();
+                    return user.save();
                 }
             }).then(() => {
                 self.set('showValidationErrors', true);

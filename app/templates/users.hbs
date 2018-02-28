@@ -33,74 +33,9 @@
         {{/each}}
     </div>
 </div>
+
 {{#if isShowingModal}}
-  <div class="create-user">
-    <div class="create-layout">
-        <h4 class="text-center">Create new profile</h4>
-        <div class="input-lable">Name<span class="validation">*</span></div>
-        <div class="emp-input">
-            {{input class="ao-input" type="text" value=model.user.name placeholder="Name" size="30" maxlength="101"}}
-            {{#if showValidationErrors}}
-                 <span class="validation">
-                    {{v-get model.user 'name' 'message'}}
-                 </span>
-            {{/if}}
-        </div>
-        <div class="input-lable">Age<span class="validation">*</span></div>
-        <div class="emp-input">
-            {{input type="text" value=model.user.age placeholder="Age" size="30" maxlength="101"}}
-            {{#if showValidationErrors}}
-                <span class="validation">
-                    {{v-get model.user 'age' 'message'}}
-                </span>
-            {{/if}}
-        </div>
-        <div class="input-lable">Marital Status<span class="validation">*</span></div>
-        <div class="emp-input">
-            {{input type="text" value=model.user.status placeholder="Status" size="30" maxlength="101"}}
-            {{#if showValidationErrors}}
-                <span class="validation">
-                    {{v-get model.user 'status' 'message'}}
-                </span>
-            {{/if}}
-        </div>
-        <div class="input-lable">Location<span class="validation">*</span></div>
-        <div class="emp-input">
-            {{input type="text" value=model.user.city placeholder="Location" size="30" maxlength="101"}}
-            {{#if showValidationErrors}}
-                <span class="validation">
-                    {{v-get model.user 'city' 'message'}}
-                </span>
-            {{/if}}
-        </div>
-        <div class="input-lable">Email<span class="validation">*</span></div>
-        <div class="emp-input">
-            {{input type="text" value=model.user.email placeholder="Email" size="30" maxlength="101"}}
-            {{#if showValidationErrors}}
-                <span class="validation">
-                    {{v-get model.user 'email' 'message'}}
-                </span>
-            {{/if}}
-        </div>
-        {{#each model.user.address as |address|}}
-            <h4 class="p-t-15 text-center">{{address.type}}</h4>
-            <div class="input-lable">Street:</div>
-            <div class="emp-input">
-                {{input type="text" value=address.street placeholder="Street" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Pin Code:</div>
-            <div class="emp-input">
-                {{input type="text" value=address.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Country:</div>
-            <div class="emp-input">
-                {{input type="text" value=address.country placeholder="Country" size="30" maxlength="101"}}
-            </div>
-        {{/each}}
-        <div class="p-t-15 text-center">
-            <button class="button" onclick={{action (mut isShowingModal) false}}>Close</button>
-            <button class="button" onclick={{action  (route-action 'saveUser' this model.user)}}>Save</button>
-        </div>
-    </div>
-  </div>
+    {{edit-user model=model source="create" isShowingModal=isShowingModal}}
 {{/if}}
+
+{{outlet}}

@@ -1,108 +1,24 @@
-<div {{action 'toggleModal'}}>
+{{#link-to 'users.user-details' user.id}}
     <article class="listing">
-    <div class="detail avatar">
-        <img src="{{user.image}}" alt="">
-    </div>
-    <div class="detail">
-        <span title="{{user.name}}">{{user.name}}</span>
-    </div>
-    <div class="detail">
-        <span title="{{user.status}}">{{user.status}}</span>
-    </div>
-    <div class="detail avatar">
-        <span title="{{user.age}}">{{user.age}}</span>
-    </div>
-    <div class="detail">
-        <span title="{{user.city}}">{{user.city}}</span>
-    </div>
-    <div class="detail">
-        <span title="{{user.email}}">{{user.email}}</span>
-    </div>
-    </article>
-</div>
-
-{{#if isShowingModal}}
-<div class="create-user">
-    <div class="text-center create-layout">
-            <h4>Profile</h4>
-            <div class="input-lable">Name:</div>
-            <div class="emp-input">
-                {{input class="ao-input" type="text" value=user.name placeholder="Name" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Age:</div>
-            <div class="emp-input">
-                {{input type="text" value=user.age placeholder="Age" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Marital Status:</div>
-            <div class="emp-input">
-                {{input type="text" value=user.status placeholder="Status" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Location:</div>
-            <div class="emp-input">
-                {{input type="text" value=user.city placeholder="Location" size="30" maxlength="101"}}
-            </div>
-            <div class="input-lable">Email:</div>
-            <div class="emp-input">
-                {{input type="text" value=user.email placeholder="Email" size="30" maxlength="101"}}
-                {{#if showValidationErrors}}
-                    <span class="validation">
-                        {{v-get model.user 'email' 'message'}}
-                    </span>
-                {{/if}}
-            </div>
-            {{#each user.address as |address|}}
-                <h4 class="p-t-15">{{address.type}}</h4>
-                <div class="input-lable">Street:</div>
-                <div class="emp-input">
-                    {{input type="text" value=address.street placeholder="Street" size="30" maxlength="101"}}
-                </div>
-                <div class="input-lable">Pin Code:</div>
-                <div class="emp-input">
-                    {{input type="text" value=address.pin-code placeholder="Pin Code" size="30" maxlength="101"}}
-                </div>
-                <div class="input-lable">Country:</div>
-                <div class="emp-input">
-                    {{input type="text" value=address.country placeholder="Country" size="30" maxlength="101"}}
-                </div>
-            {{/each}}
-        <div class="p-t-15">
-            <button class="button" onclick={{action (mut showSaveConfirm) true}}>Save</button>
-            <button class="button" onclick={{action (mut showRemoveConfirm) true}}>Remove</button>
+        <div class="detail avatar">
+            <img src="{{user.image}}" alt="">
         </div>
-    </div>
-  </div>
-{{/if}}
-
-{{#if showRemoveConfirm}}
-  {{#modal-dialog onClose="toggleModal"
-        targetAttachment="center"
-        translucentOverlay=true}}
-            <div class="confirm-layout">
-               <h3 class="p-t-15">
-                    Are you sure you want to remove {{user.name}}?
-               </h3>
-                <div class="p-t-15">
-                    <button class="button" onclick={{action  (route-action 'removeUser' this user)}}>Yes, Remove</button>
-                    <button class="button" onclick={{action (mut showRemoveConfirm) false}}>Cancel</button>
-                </div>
-            </div>
-  {{/modal-dialog}}
-{{/if}}
-
-{{#if showSaveConfirm}}
-  {{#modal-dialog onClose="toggleModal"
-        targetAttachment="center"
-        translucentOverlay=true}}
-            <div class="confirm-layout">
-               <h3 class="p-t-15">
-                    Are you sure you want update information of {{user.name}}?
-               </h3>
-                <div class="p-t-15">
-                    <button class="button" onclick={{action  (route-action 'editUser' this user)}}>Yes, Update</button>
-                    <button class="button" onclick={{action (mut showSaveConfirm) false}}>Cancel</button>
-                </div>
-            </div>
-  {{/modal-dialog}}
-{{/if}}
+        <div class="detail">
+            <span title="{{user.name}}">{{user.name}}</span>
+        </div>
+        <div class="detail">
+            <span title="{{user.status}}">{{user.status}}</span>
+        </div>
+        <div class="detail avatar">
+            <span title="{{user.age}}">{{user.age}}</span>
+        </div>
+        <div class="detail">
+            <span title="{{user.city}}">{{user.city}}</span>
+        </div>
+        <div class="detail text-truncated">
+            <span title="{{user.email}}">{{user.email}}</span>
+        </div>
+    </article>
+{{/link-to}}
 
 {{yield}}
